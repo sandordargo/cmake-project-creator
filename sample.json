@@ -1,0 +1,18 @@
+{
+	"projectName": "MyTestProject",
+	"directories": {
+		"src": {
+			"type": "source",
+			"main": "true",
+			"include": "true",
+			"dependencies": []
+		},
+		"include": {
+			"type": "include"
+		},
+		"tests": {
+			"type": "tests",
+			"dependencies": []
+		}
+	}
+}

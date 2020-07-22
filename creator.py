@@ -15,6 +15,16 @@ TODO:
 - - executable / library / with test
 - - conan or submodule
 - - depenedency among others /probably needs a test
+
+? shared/static
+? where to create components
+? recursive runtest
+-- test implies a dependency on gtest and src on the same level
+{
+"src" : {"type": "source", "main": "true", "dependencies":[]},
+"include" : {"type": "include",},
+"test" : {"type": "test", "dependencies":[] },
+}
 '''
 
 def parse_arguments():
