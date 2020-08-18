@@ -1,0 +1,63 @@
+{
+	"projectName": "MyTestProjectP",
+	"directories": [{
+		"name": "proj",
+		"type": "intermediate",
+		"subdirectories": [
+
+			{
+				"name": "code",
+				"type": "intermediate",
+				"subdirectories": [{
+						"name": "src",
+						"type": "source",
+						"library": null,
+						"main": "true",
+						"include": "true",
+						"dependencies": [{
+							"type": "internal",
+							"path": "proj/othercode/src"
+						}],
+						"subdirectories": []
+					},
+					{
+						"name": "include",
+						"type": "include",
+						"subdirectories": []
+					},
+					{
+						"name": "tests",
+						"type": "tests",
+						"dependencies": [],
+						"subdirectories": []
+					}
+				]
+			},
+			{
+				"name": "othercode",
+				"type": "intermediate",
+				"subdirectories": [{
+						"name": "src",
+						"type": "source",
+						"library": "static",
+						"main": "true",
+						"include": "true",
+						"dependencies": [],
+						"subdirectories": []
+					},
+					{
+						"name": "include",
+						"type": "include",
+						"subdirectories": []
+					},
+					{
+						"name": "tests",
+						"type": "tests",
+						"dependencies": [],
+						"subdirectories": []
+					}
+				]
+			}
+		]
+	}]
+}

@@ -1,18 +1,51 @@
 {
 	"projectName": "MyTestProject",
-	"directories": {
-		"src": {
-			"type": "source",
-			"main": "true",
-			"include": "true",
-			"dependencies": []
-		},
-		"include": {
-			"type": "include"
-		},
-		"tests": {
-			"type": "tests",
-			"dependencies": []
-		}
-	}
+	"directories": [{
+		"name": "code",
+		"type": "intermediate",
+		"subdirectories": [{
+				"name": "src",
+				"type": "source",
+				"main": "true",
+				"include": "true",
+				"dependencies": [],
+				"subdirectories": []
+			},
+			{
+				"name": "include",
+				"type": "include",
+				"subdirectories": []
+			},
+			{
+				"name": "tests",
+				"type": "tests",
+				"dependencies": [],
+				"subdirectories": []
+			}
+		]
+	},
+	{
+		"name": "othercode",
+		"type": "intermediate",
+		"subdirectories": [{
+				"name": "src",
+				"type": "source",
+				"main": "true",
+				"include": "true",
+				"dependencies": [],
+				"subdirectories": []
+			},
+			{
+				"name": "include",
+				"type": "include",
+				"subdirectories": []
+			},
+			{
+				"name": "tests",
+				"type": "tests",
+				"dependencies": [],
+				"subdirectories": []
+			}
+		]
+	}]
 }

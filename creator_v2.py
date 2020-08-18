@@ -3,6 +3,7 @@ import os
 import shutil
 import stat
 import json
+import directory_factory
 
 '''
 TODO:
@@ -31,13 +32,46 @@ Create some files on the fly, so we append lines and write once in the end
 "include" : {"type": "include",},
 "test" : {"type": "test", "dependencies":[] },
 }
+
+
+In an object model:
+Have a Directory
+    a Directory has a name
+    a type
+    it can have a main
+    it can have a cmakelist
+    it can contain other subdirecotires
+    it can have dependencies
+    
+Have a Dependency
+    a dependency can have a type
+    and an address
+    or maybe they can be subtypes, like internal, conan...
+    
+should we care about intermediate directories in terms os saving? maybe not...
+
+
+TODO
+- remove hardcoded stuff
+DONE - - hasTest should be computed or passed in?, no need for the moment
+- src should have include path
+- test should have either or both include/src path 
+- has main or executable? if not is it a library? can it be both?
+- optional binary/library names
+DONE - v2: nested folders
+DONE - v2: multiple libs
+DONE - shared/static
+- depend on other internal lib - check in cmake, how to!
+- depend on conan libs
+- optional compiler
+- optional unit test pack
 '''
 
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--description',
-                        default="sample.json",
+                        default="sample-v3.json",
                         type=str,
                         dest='description',
                         help='Project description'
@@ -51,119 +85,18 @@ def parse_arguments():
     return arguments
 
 
-def create_source_directory(path, description, project_file_name, hasTest=True):
-    print("Create source")
+def create_plumbing(path, subdirs):
+    runtest = " ; ".join(
+        f"./{sd}/bin/{project_dir_name}_{sd.split('/')[-2] if '/' in sd else sd}_test" for sd in subdirs if
+        'test' in sd)
+    runtest = "(" + runtest + ")"
 
-    has_include = description["include"] == 'true'
-
-    with open(f'{path}/CMakeLists.txt', "w") as cmake:
-        content = f"""
-
-set(BINARY ${{CMAKE_PROJECT_NAME}})
-
-{"include_directories(../include)" if has_include else ""}
-
-file(GLOB SOURCES *.cpp)
-set(SOURCES ${{SOURCES}})
-
-add_executable(myProject ${{SOURCES}})
-{"add_library(${BINARY}_lib STATIC ${SOURCES})" if hasTest else ""}
-    """
-        cmake.write(content)
-
-    with open(f'{path}/{project_file_name}.cpp', "w") as source:
-        include_statement = f'#include "{project_file_name}.h"' if has_include else ''
-        source.write(
-            f"""
-    {include_statement}
-    #include <iostream>
-
-    void {project_file_name}::hello() {{
-        std::cout << "hello" << std::endl;
-    }}
-
-    """)
-
-    if description['main'] == 'true':
-        with open(f'{project_dir_name}/src/main.cpp', "w") as main:
-            main.write(
-                f"""
-        #include "{project_file_name}.{'h' if has_include else 'cpp'}"
-
-        int main() {{
-            {project_file_name} o;
-            o.hello();
-        }}
-        """)
-
-
-def create_include_directory(path, description, project_file_name):
-    print("Create include")
-
-    with open(f'{path}/{project_file_name}.h', "w") as header:
-        header.write(
-f"""
-#pragma once
-
-class {project_file_name} {{
-public:
-  void hello();
-}};
-""")
-
-
-def create_test_directory(path, description, project_file_name):
-    print("Create test")
-    with open(f'{path}/main.cpp', "w") as main:
-            main.write(
-                """
-#include "gtest/gtest.h"
-
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
-                """
-        )
-    with open(f'{path}/Test{project_file_name}.cpp', "w") as testSrc:
-            testSrc.write(
-                    f"""
-#include "gtest/gtest.h"
-#include "{project_file_name}.h"
-
-TEST(blaTest, test1) {{
-    ASSERT_EQ (1, 0);
-
-}}
-                """
-        )
-    with open(f'{path}/CMakeLists.txt', "w") as testsCmake:
-                testsCmake.write(
-                    """
-
-set(BINARY ${CMAKE_PROJECT_NAME}_test)
-file(GLOB_RECURSE TEST_SOURCES LIST_DIRECTORIES false *.h *.cpp)
-
-set(SOURCES ${TEST_SOURCES})
-
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)  # Includes the contents of the conanbuildinfo.cmake file.
-conan_basic_setup()  # Prepares the CMakeList.txt for Conan.
-
-include_directories(../include)
-
-add_executable(${BINARY} ${TEST_SOURCES})
-target_link_libraries(${BINARY} PUBLIC ${CONAN_LIBS})
-
-add_test(NAME ${BINARY} COMMAND ${BINARY})
-    """)
-
-def create_plumbing(path, hasTest, hasInclude):
     with open(f'{path}/runTests.sh', "w") as runTests:
         runTests.write(
 
             f"""
     CURRENT_DIR=`pwd`
-    cd build && rm -rf * && conan install .. -s compiler.libcxx=libstdc++11 && cmake .. && make && ./tests/bin/{project_dir_name}_test
+    cd build && rm -rf * && conan install .. -s compiler.libcxx=libstdc++11 && cmake .. && make && {runtest}
     cd $CURRENT_DIR
                     """
         )
@@ -180,31 +113,19 @@ gtest/1.8.1
 cmake
             """
         )
-    # with open(f'{path}/CMakeLists.txt', "w") as cmake:
-    #         content = f"""
-    #
-    # cmake_minimum_required(VERSION 3.10)
-    # project({path})
-    #
-    # set(CMAKE_CXX_STANDARD 17)
-    #
-    # {"add_subdirectory(tests)" if hasTest else ""}
-    # {"include_directories(include)" if hasInclude else ""}
-    #
-    # file(GLOB SOURCES src/*.cpp)
-    # set(SOURCES ${{SOURCES}})
-    #
-    # add_executable(myProject ${{SOURCES}})
-    # {"add_library(${BINARY}_lib STATIC ${SOURCES})" if hasTest else ""}
-    # """
-    #         cmake.write(content)
 
 
-def collect_subdirectories(paths, directories):
-    paths = []
+def collect_subdirectories(directories, name="", paths=None):
+    print("begin", name, directories)
+    if not paths:
+        paths = []
     for dir in directories:
-        if dir in ["src", "tests"]:
-            paths.append(dir)
+        print('d', dir)
+        if 'type' in dir and dir['type'] in ["source", "tests"]:
+            paths.append(os.path.join(name, dir['name']))
+            print('a', paths)
+        if 'subdirectories' in dir:
+            paths = collect_subdirectories(dir['subdirectories'], os.path.join(name, dir['name']), paths)
     return paths
 
 
@@ -226,34 +147,36 @@ def create_main_cmakelists(path, projectname, subdirs):
         cmake.write(content)
 
 
+def iterate_on_dirs(directories, relative_root):
+    for dir in directories:
+        rel_path = os.path.join(relative_root, dir['name'])
+
+        if dir["type"] == "intermediate":
+            print("nothing to do")
+            iterate_on_dirs(dir['subdirectories'], rel_path)
+            continue
+        directory_factory.make(dir["type"], rel_path).create(dir, project_file_name)
+
+
 if __name__ == "__main__":
     arguments = parse_arguments()
 
-    with open('sample.json') as json_file:
+    with open(arguments.description) as json_file:
         project_description = json.load(json_file)
 
     project_dir_name = project_description['projectName']
     project_file_name = project_description['projectName'].capitalize()
     if arguments.cleanup:
-        shutil.rmtree(project_dir_name)
+        try:
+            shutil.rmtree(project_dir_name)
+        except:
+            pass
 
     os.makedirs(os.path.join(project_dir_name, 'build'))
-    create_plumbing(project_dir_name, True, True)
 
-    subdirs = collect_subdirectories(project_dir_name, project_description['directories'])
+    subdirs = collect_subdirectories(project_description['directories'])
+    create_plumbing(project_dir_name, subdirs)
+    print(subdirs)
     create_main_cmakelists(project_dir_name, project_description['projectName'], subdirs)
 
-    for dir in project_description['directories']:
-        rel_path = os.path.join(project_dir_name, dir)
-        print(rel_path)
-        os.makedirs(rel_path)
-        parent = project_description['directories']
-        if project_description['directories'][dir]["type"] == "source":
-            create_source_directory(rel_path, project_description['directories'][dir], project_file_name)
-        elif project_description['directories'][dir]["type"] == "include":
-            create_include_directory(rel_path, project_description['directories'][dir], project_file_name)
-        elif project_description['directories'][dir]["type"] == "tests":
-            create_test_directory(rel_path, project_description['directories'][dir], project_file_name)
-        else:
-            print("unsupported type")
-
+    iterate_on_dirs(project_description['directories'], project_dir_name)
