@@ -6,7 +6,7 @@
 		"subdirectories": [{
 				"name": "src",
 				"type": "source",
-				"main": "true",
+				"executable": "true",
 				"include": "true",
 				"dependencies": [],
 				"subdirectories": []
@@ -14,12 +14,6 @@
 			{
 				"name": "include",
 				"type": "include",
-				"subdirectories": []
-			},
-			{
-				"name": "tests",
-				"type": "tests",
-				"dependencies": [],
 				"subdirectories": []
 			}
 		]
@@ -30,7 +24,7 @@
 		"subdirectories": [{
 				"name": "src",
 				"type": "source",
-				"main": "true",
+				"executable": "true",
 				"include": "true",
 				"dependencies": [],
 				"subdirectories": []
@@ -38,12 +32,6 @@
 			{
 				"name": "include",
 				"type": "include",
-				"subdirectories": []
-			},
-			{
-				"name": "tests",
-				"type": "tests",
-				"dependencies": [],
 				"subdirectories": []
 			}
 		]

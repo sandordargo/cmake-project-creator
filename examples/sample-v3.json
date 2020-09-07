@@ -1,5 +1,5 @@
 {
-	"projectName": "MyTestProjectP",
+	"projectName": "MyTestProjectV3",
 	"directories": [{
 		"name": "proj",
 		"type": "intermediate",
@@ -12,11 +12,11 @@
 						"name": "src",
 						"type": "source",
 						"library": null,
-						"main": "true",
+						"executable": "true",
 						"include": "true",
 						"dependencies": [{
 							"type": "internal",
-							"path": "proj/othercode/src"
+							"link": "proj/othercode/src"
 						}],
 						"subdirectories": []
 					},
@@ -28,7 +28,11 @@
 					{
 						"name": "tests",
 						"type": "tests",
-						"dependencies": [],
+						"dependencies": [{
+							"type": "conan",
+							"name": "gtest",
+							"version": "1.8.1"
+						}],
 						"subdirectories": []
 					}
 				]
@@ -40,7 +44,7 @@
 						"name": "src",
 						"type": "source",
 						"library": "static",
-						"main": "true",
+						"executable": "true",
 						"include": "true",
 						"dependencies": [],
 						"subdirectories": []
@@ -53,7 +57,11 @@
 					{
 						"name": "tests",
 						"type": "tests",
-						"dependencies": [],
+						"dependencies": [{
+							"type": "conan",
+							"name": "gtest",
+							"version": "1.8.1"
+						}],
 						"subdirectories": []
 					}
 				]
