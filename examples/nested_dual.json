@@ -1,12 +1,12 @@
 {
-	"projectName": "MyTestProjectV3",
+	"projectName": "NestedDual",
 	"directories": [{
-		"name": "proj",
+		"name": "common_root",
 		"type": "intermediate",
 		"subdirectories": [
 
 			{
-				"name": "code",
+				"name": "executable",
 				"type": "intermediate",
 				"subdirectories": [{
 						"name": "src",
@@ -16,7 +16,7 @@
 						"include": "true",
 						"dependencies": [{
 							"type": "internal",
-							"link": "proj/othercode/src"
+							"link": "common_root/library/src"
 						}],
 						"subdirectories": []
 					},
@@ -38,7 +38,7 @@
 				]
 			},
 			{
-				"name": "othercode",
+				"name": "library",
 				"type": "intermediate",
 				"subdirectories": [{
 						"name": "src",

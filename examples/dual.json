@@ -1,7 +1,7 @@
 {
-	"projectName": "MyTestProjectV2",
+	"projectName": "Dual",
 	"directories": [{
-			"name": "code",
+			"name": "executable",
 			"type": "intermediate",
 			"subdirectories": [{
 					"name": "src",
@@ -11,7 +11,7 @@
 					"include": "true",
 					"dependencies": [{
 						"type": "internal",
-						"link": "othercode/src"
+						"link": "library/src"
 					}],
 					"subdirectories": []
 				},
@@ -33,7 +33,7 @@
 			]
 		},
 		{
-			"name": "othercode",
+			"name": "library",
 			"type": "intermediate",
 			"subdirectories": [{
 					"name": "src",

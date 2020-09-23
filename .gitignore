@@ -1,3 +1,6 @@
 .idea
+.coverage
+cover/
 __pycache__/
 *.pyc
+generated_projects/

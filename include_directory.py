@@ -2,20 +2,21 @@ import directory
 
 
 class IncludeDirectory(directory.Directory):
-    def __init__(self, path, description, dependencies):
+    def __init__(self, project_home, path, description, project_file_name, dependencies):
         self.path = path
-        directory.Directory.__init__(self, path, description, dependencies)
+        directory.Directory.__init__(self, project_home, path, description, project_file_name, dependencies)
 
-    def create(self, project_file_name, parsed_dirs):
+    def create(self, parsed_dirs):
         directory.Directory.make_dirs(self)
-        with open(f'{self.path}/{project_file_name}.h', "w") as header:
-            header.write(
-                f"""
-        #pragma once
 
-        class {project_file_name} {{
-        public:
-          void hello();
-        }};
-        """)
+        self.write_file(*self.create_header_content())
 
+    def create_header_content(self):
+        return f'{self.path}/{self.project_file_name}.h', \
+f"""#pragma once
+
+class {self.project_file_name} {{
+public:
+  void hello();
+}};
+"""
