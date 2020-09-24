@@ -1,4 +1,4 @@
-import directory
+from cmake_project_creator import directory
 
 
 class IncludeDirectory(directory.Directory):

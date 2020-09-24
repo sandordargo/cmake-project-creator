@@ -1,5 +1,4 @@
-import test_directory
-import dependency
+from cmake_project_creator import test_directory, dependency
 
 
 class Test_TestDirectory:

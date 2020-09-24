@@ -1,7 +1,4 @@
-import source_directory
-import include_directory
-import test_directory
-import dependency
+from cmake_project_creator import test_directory, dependency, include_directory, source_directory
 
 
 def make(project_home, path, description, project_file_name):

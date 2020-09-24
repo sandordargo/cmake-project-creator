@@ -1,4 +1,4 @@
-import include_directory
+from cmake_project_creator import include_directory
 
 
 class TestIncludeDirectory:

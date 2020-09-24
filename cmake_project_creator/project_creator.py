@@ -3,7 +3,7 @@ import os
 import shutil
 import stat
 import json
-import directory_factory
+from cmake_project_creator import directory_factory
 
 '''
 TODO:

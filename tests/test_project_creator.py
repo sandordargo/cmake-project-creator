@@ -1,6 +1,4 @@
-import project_creator
-import source_directory
-import dependency
+from cmake_project_creator import dependency, project_creator, source_directory
 from nose.tools import *
 
 DIRECTORIES = [{
@@ -110,7 +108,8 @@ class TestProjectCreator:
 
         conan_dependency = dependency.Dependency("conan", "gtest", "1.8.1")
 
-        parsed_directories = [source_directory.SourceDirectory("projects_root", "src", single_directory[0], "DummyProject", [conan_dependency])]
+        parsed_directories = [
+            source_directory.SourceDirectory("projects_root", "src", single_directory[0], "DummyProject", [conan_dependency])]
         print(project_creator.collect_conan_dependencies(parsed_directories))
         assert {'gtest': '1.8.1'} == project_creator.collect_conan_dependencies(parsed_directories)
 
@@ -133,7 +132,8 @@ class TestProjectCreator:
         conan_dependency = dependency.Dependency("conan", "gtest", "1.8.1")
         conan_dependency2 = dependency.Dependency("conan", "gtest", "1.7.1")
 
-        parsed_directories = [source_directory.SourceDirectory("projects_root", "src", single_directory[0], "DummyProject", [conan_dependency, conan_dependency2])]
+        parsed_directories = [
+            source_directory.SourceDirectory("projects_root", "src", single_directory[0], "DummyProject", [conan_dependency, conan_dependency2])]
         print(project_creator.collect_conan_dependencies(parsed_directories))
 
     def test_create_main_cmakelists(self):

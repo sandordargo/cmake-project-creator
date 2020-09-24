@@ -1,4 +1,4 @@
-import dependency
+from cmake_project_creator import dependency
 from nose.tools import *
 
 

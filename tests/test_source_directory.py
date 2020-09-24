@@ -1,6 +1,4 @@
-import source_directory
-import dependency
-import directory
+from cmake_project_creator import dependency, directory, source_directory
 from nose.tools import *
 
 
@@ -32,7 +30,8 @@ class TestSourceDirectory:
     def test_get_include_library_of_directory(self):
         path = "root/project/src"
         expected = "project/include"
-        assert expected == source_directory.get_include_library_of_directory(directory.Directory("projects_root", path, {}, "", []))
+        assert expected == source_directory.get_include_library_of_directory(
+            directory.Directory("projects_root", path, {}, "", []))
 
     def test_creates_main(self):
         description = {

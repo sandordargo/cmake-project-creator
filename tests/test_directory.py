@@ -1,4 +1,4 @@
-from directory import Directory
+from cmake_project_creator.directory import Directory
 
 class TestDirectory:
 

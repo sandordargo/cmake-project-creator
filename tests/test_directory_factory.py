@@ -1,7 +1,4 @@
-import directory_factory
-import source_directory
-import include_directory
-import test_directory
+from cmake_project_creator import test_directory, include_directory, directory_factory, source_directory
 from nose.tools import *
 
 
