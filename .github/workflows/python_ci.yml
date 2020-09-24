@@ -17,6 +17,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pylint
+        pip install nose
+        pip install coverage
+    - name: Running nosetests
+      run: |
+        nosetests --with-coverage --cover-erase
     - name: Analysing the code with pylint
       run: |
         pylint `ls -R|grep .py$|xargs`
