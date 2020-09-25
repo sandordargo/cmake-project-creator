@@ -3,7 +3,12 @@ from cmake_project_creator import directory
 
 class SourceDirectory(directory.Directory):
     def __init__(self, project_home, path, description, project_file_name, dependencies):
-        directory.Directory.__init__(self, project_home, path, description, project_file_name, dependencies)
+        directory.Directory.__init__(self,
+                                     project_home,
+                                     path,
+                                     description,
+                                     project_file_name,
+                                     dependencies)
         self.path = path
         self.has_include = "include" in self.description and self.description["include"] == 'true'
 
@@ -13,16 +18,16 @@ class SourceDirectory(directory.Directory):
     def create(self, parsed_dirs):
         directory.Directory.make_dirs(self)
 
-        files_to_create = [
+        file_creators = [
             self.create_cmakelists,
             self.create_source_file,
             self.create_main
         ]
 
-        for f in files_to_create:
-            self.write_file(*f(parsed_dirs))
+        for file_creator in file_creators:
+            self.write_file(*file_creator(parsed_dirs))
 
-    def create_main(self, parsed_dirs):
+    def create_main(self, _):
         if self.description['executable'] == 'true':
             content = \
 f"""#include "{self.project_file_name}.{'h' if self.has_include else 'cpp'}"
@@ -35,7 +40,7 @@ int main() {{
             return f'{self.path}/main.cpp', content
         return None, ""
 
-    def create_source_file(self, parsed_dirs):
+    def create_source_file(self, _):
         include_statement = f'#include "{self.project_file_name}.h"' if self.has_include else ''
         content = \
 f"""{include_statement}
@@ -63,8 +68,10 @@ void {self.project_file_name}::hello() {{
                 link_directories_commands.extend(
                     [f"include_directories(${{PROJECT_SOURCE_DIR}}/{get_include_library_of_directory(d)})"
                      for d in parsed_dirs
-                     if d.description["type"] and "include" in d.description and d.description[
-                         "include"] == "true" and d.get_path_without_project_root() == dependency['link']])
+                     if d.description["type"] and
+                        "include" in d.description and
+                        d.description["include"] == "true" and
+                        d.get_path_without_project_root() == dependency['link']])
                 link_directories_commands.append(f"link_directories(${{PROJECT_SOURCE_DIR}}/{dependency['link']})")
 
             else:
@@ -96,11 +103,12 @@ set(SOURCES ${{SOURCES}})
 
 def raise_if_invalid_dependency(dependency, parsed_dirs):
     valid_dependency = False
-    for d in parsed_dirs:
-        if d.description["type"] and d.description["type"] in ["source",
-                                                               "include"] and d.get_path_without_project_root() == \
-                dependency["link"]:
+    for directory in parsed_dirs:
+        if directory.description["type"] and \
+                directory.description["type"] in ["source", "include"] and \
+                directory.get_path_without_project_root() == dependency["link"]:
             valid_dependency = True
+            break
     if not valid_dependency:
         raise ValueError(f"dependent directory {dependency['link']} doesn't exist")
 

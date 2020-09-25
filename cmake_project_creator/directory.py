@@ -2,7 +2,7 @@ import os
 
 
 class Directory:
-    def __init__(self, output_root, path, description, project_file_name, dependencies = None):
+    def __init__(self, output_root, path, description, project_file_name, dependencies=None):
         self.output_root = output_root
         self.path = path
         self.description = description

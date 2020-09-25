@@ -19,8 +19,10 @@ def parse_arguments():
                         type=str,
                         dest='output_root',
                         help='The directory where your new projects will be generated. '
-                             'In case you want to generate MyCmakeProject and you set --output to MyProjects, '
-                             'MyProjects/MyCmakeProject will be generated. In case the directory doesn\'t exist '
+                             'In case you want to generate MyCmakeProject and you set '
+                             '--output to MyProjects, '
+                             'MyProjects/MyCmakeProject will be generated. '
+                             'In case the directory doesn\'t exist '
                              'it will be still created.'
                         )
     parser.add_argument('-c', '--cleanup',
@@ -40,14 +42,14 @@ def create_plumbing(output_root, path, subdirs, parsed_directories):
 
     print(subdirs)
     runtest = " ; ".join(
-        f"./{sd}/bin/{project_dir_name}_{sd.split('/')[-2] if '/' in sd else sd}_test" for sd in subdirs if
-        'test' in sd)
+        f"./{sd}/bin/{project_dir_name}_{sd.split('/')[-2] if '/' in sd else sd}_test"
+        for sd in subdirs if 'test' in sd)
     runtest = f"({runtest})" if runtest else ""
 
     with open(f'{os.path.join(output_root, path)}/runTests.sh', "w") as runTests:
         runTests.write(
             f"""CURRENT_DIR=`pwd`
-cd build && rm -rf * && {conan_install} {"&&" if conan_install else ""} cmake .. && make {"&& " + runtest if runtest else ""}
+cd build && rm -rf * && {(conan_install + "&&") if conan_install else ""} cmake .. && make {"&& " + runtest if runtest else ""}
 cd "${{CURRENT_DIR}}"
 """)
     st = os.stat(f'{os.path.join(output_root, path)}/runTests.sh')
@@ -73,7 +75,8 @@ def collect_cmake_subdirectories(directories, name="", paths=None):
         if 'type' in directory and directory['type'] in ["source", "tests"]:
             paths.append(os.path.join(name, directory['name']))
         if 'subdirectories' in directory:
-            paths = collect_cmake_subdirectories(directory['subdirectories'], os.path.join(name, directory['name']),
+            paths = collect_cmake_subdirectories(directory['subdirectories'],
+                                                 os.path.join(name, directory['name']),
                                                  paths)
     return paths
 
@@ -99,14 +102,20 @@ def parse_directories(directories, project_home, relative_root, project_file_nam
         rel_path = os.path.join(relative_root, directory['name'])
 
         if directory["type"] == "intermediate":
-            parsed_directories.extend(parse_directories(directory['subdirectories'], project_home, rel_path, project_file_name))
+            parsed_directories.extend(parse_directories(directory['subdirectories'],
+                                                        project_home,
+                                                        rel_path,
+                                                        project_file_name))
             continue
 
-        parsed_directories.append(directory_factory.make(project_home, rel_path, directory, project_file_name))
+        parsed_directories.append(directory_factory.make(project_home,
+                                                         rel_path,
+                                                         directory,
+                                                         project_file_name))
     return parsed_directories
 
 
-def create_cpp_project(project_file_name, parsed_directories):
+def create_cpp_project(parsed_directories):
     for directory in parsed_directories:
         directory.create(parsed_directories)
 
@@ -127,8 +136,8 @@ def collect_conan_dependencies(parsed_directories):
 def cleanup_project_folder(project_directory):
     try:
         shutil.rmtree(project_directory)
-    except:
-        pass
+    except Exception as e:
+        print(f"Cleanup of {project_directory} failed due to {e}")
 
 
 def prepare_build_directory(project_directory):
@@ -160,8 +169,16 @@ if __name__ == "__main__":
     cmake_subdirectories = collect_cmake_subdirectories(project_description['directories'])
     print(f"The identified sub cmake projects are {cmake_subdirectories}")
 
-    write_file(*create_main_cmakelists(arguments.output_root, project_dir_name, cmake_subdirectories))
+    write_file(*create_main_cmakelists(arguments.output_root,
+                                       project_dir_name,
+                                       cmake_subdirectories))
 
-    parsed_directories = parse_directories(project_description['directories'], arguments.output_root, project_dir_name, project_file_name)
-    create_plumbing(arguments.output_root, project_dir_name, cmake_subdirectories, parsed_directories)
-    create_cpp_project(project_file_name, parsed_directories)
+    parsed_directories = parse_directories(project_description['directories'],
+                                           arguments.output_root,
+                                           project_dir_name,
+                                           project_file_name)
+    create_plumbing(arguments.output_root,
+                    project_dir_name,
+                    cmake_subdirectories,
+                    parsed_directories)
+    create_cpp_project(parsed_directories)
