@@ -24,4 +24,5 @@ jobs:
         nosetests --with-coverage --cover-erase
     - name: Analysing the code with pylint
       run: |
-        pylint *
+        pylint `find . -type f -name "*.py"`
+
