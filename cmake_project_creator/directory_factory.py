@@ -10,5 +10,3 @@ def make(project_home, path, description, project_file_name):
 
     dependencies = dependency.make_dependencies(description["dependencies"]) if "dependencies" in description else []
     return mapper[description["type"]](project_home, path, description, project_file_name, dependencies)
-
-
