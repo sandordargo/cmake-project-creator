@@ -1,6 +1,5 @@
 from cmake_project_creator import test_directory, include_directory, directory_factory, source_directory
-from nose.tools import *
-
+from nose.tools import raises
 
 class TestDirectoryFactory:
 

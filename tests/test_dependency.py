@@ -1,5 +1,5 @@
 from cmake_project_creator import dependency
-from nose.tools import *
+from nose.tools import raises
 
 
 class TestDependency:

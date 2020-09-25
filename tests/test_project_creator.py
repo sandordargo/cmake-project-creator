@@ -1,5 +1,5 @@
 from cmake_project_creator import dependency, project_creator, source_directory
-from nose.tools import *
+from nose.tools import raises
 
 DIRECTORIES = [{
     "name": "proj",

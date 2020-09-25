@@ -1,5 +1,5 @@
 from cmake_project_creator import dependency, directory, source_directory
-from nose.tools import *
+from nose.tools import raises
 
 
 class TestSourceDirectory:
