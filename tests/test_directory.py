@@ -1,19 +1,24 @@
 from cmake_project_creator.directory import Directory
 
-class TestDirectory:
 
-    def test_get_suffix(self):
-        directory = Directory("projects_root", "ProjectRoot/Suffix/Extension", {}, "DummyProjectFileName")
-        assert "Suffix" == directory.get_name_suffix()
+def test_get_suffix():
+    directory = Directory("projects_root", "ProjectRoot/Suffix/Extension",
+                          {}, "DummyProjectFileName")
+    assert directory.get_name_suffix() == "Suffix"
 
-    def test_only_project_root(self):
-        directory = Directory("projects_root", "ProjectRoot", {}, "DummyProjectFileName")
-        assert "ProjectRoot" == directory.get_name_suffix()
 
-    def test_get_path_without_project_root(self):
-        directory = Directory("projects_root", "ProjectRoot/Suffix/Extension", {}, "DummyProjectFileName")
-        assert "Suffix/Extension" == directory.get_path_without_project_root()
+def test_only_project_root():
+    directory = Directory("projects_root", "ProjectRoot", {}, "DummyProjectFileName")
+    assert directory.get_name_suffix() == "ProjectRoot"
 
-    def test_nice_formatting(self):
-        directory = Directory("projects_root", "ProjectRoot/Suffix/Extension", {}, "DummyProjectFileName")
-        assert "Directory(path: ProjectRoot/Suffix/Extension, description:{})" == str(directory)
+
+def test_get_path_without_project_root():
+    directory = Directory("projects_root", "ProjectRoot/Suffix/Extension",
+                          {}, "DummyProjectFileName")
+    assert directory.get_path_without_project_root() == "Suffix/Extension"
+
+
+def test_nice_formatting():
+    directory = Directory("projects_root", "ProjectRoot/Suffix/Extension",
+                          {}, "DummyProjectFileName")
+    assert str(directory) == "Directory(path: ProjectRoot/Suffix/Extension, description:{})"
