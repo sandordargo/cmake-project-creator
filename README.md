@@ -1,3 +1,5 @@
+[![Actions Status](https://github.com/sandordargo/cmake-project-creator/workflows/PythonCi/badge.svg)](https://github.com/sandordargo/cmake-project-creator/actions)
+
 ## Cmake Project Creator
 
 Cmake Project Creator helps you generate a new C++ project. Instead of writing the Cmakefiles and create all the folder by hand, you can either
