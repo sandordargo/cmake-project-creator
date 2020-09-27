@@ -24,5 +24,5 @@ jobs:
         nosetests --with-coverage --cover-erase
     - name: Analysing the code with pylint
       run: |
-        pylint `find . -type f -name "*.py"`
+        python .github/workflows/lint.py -p cmake_project_creator/ -t 7.5
 
