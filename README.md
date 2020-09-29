@@ -10,7 +10,7 @@ Cmake Project Creator helps you generate a new C++ project. Instead of writing t
 
 ## How to use it?
 
-Call `python project_creator.py --help` to print the help message.
+Call `./create_cmake_project.py --help` to print the help message.
 
 Briefly, you can call the project_creator with one of the predefined options, or you can pass in your own project description.
 

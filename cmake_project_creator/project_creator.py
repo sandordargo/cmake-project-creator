@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import argparse
 import os
 import shutil
@@ -42,7 +44,7 @@ def create_plumbing(output_root, path, subdirs, parsed_directories):
 
     print(subdirs)
     runtest = " ; ".join(
-        f"./{sd}/bin/{project_dir_name}_{sd.split('/')[-2] if '/' in sd else sd}_test"
+        f"./{sd}/bin/{path}_{sd.split('/')[-2] if '/' in sd else sd}_test"
         for sd in subdirs if 'test' in sd)
     runtest = f"({runtest})" if runtest else ""
 
@@ -150,7 +152,7 @@ def write_file(full_path, content):
             file.write(content)
 
 
-if __name__ == "__main__":
+def run():
     arguments = parse_arguments()
 
     with open(arguments.description) as json_file:
@@ -182,3 +184,7 @@ if __name__ == "__main__":
                     cmake_subdirectories,
                     parsed_directories)
     create_cpp_project(parsed_directories)
+
+
+if __name__ == "__main__":
+    run()
