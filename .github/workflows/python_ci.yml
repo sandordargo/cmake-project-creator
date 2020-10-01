@@ -24,5 +24,5 @@ jobs:
         nosetests --with-coverage --cover-erase --cover-min-percentage=70
     - name: Analysing the code with pylint
       run: |
-        python .github/workflows/lint.py -p cmake_project_creator/ -t 7.5
+        pylint --rcfile=.pylintrc cmake_project_creator
 
