@@ -3,12 +3,11 @@ from cmake_project_creator import directory
 
 class SourceDirectory(directory.Directory):
     def __init__(self, project_home, path, description, project_file_name, dependencies):
-        directory.Directory.__init__(self,
-                                     project_home,
-                                     path,
-                                     description,
-                                     project_file_name,
-                                     dependencies)
+        super().__init__(project_home,
+                         path,
+                         description,
+                         project_file_name,
+                         dependencies)
         self.path = path
         self.has_include = "include" in self.description and self.description["include"] == 'true'
 
@@ -30,7 +29,7 @@ class SourceDirectory(directory.Directory):
     def create_main(self, _):
         if self.description['executable'] == 'true':
             content = \
-f"""#include "{self.project_file_name}.{'h' if self.has_include else 'cpp'}"
+                f"""#include "{self.project_file_name}.{'h' if self.has_include else 'cpp'}"
 
 int main() {{
     {self.project_file_name} o;
@@ -43,7 +42,7 @@ int main() {{
     def create_source_file(self, _):
         include_statement = f'#include "{self.project_file_name}.h"' if self.has_include else ''
         content = \
-f"""{include_statement}
+            f"""{include_statement}
 #include <iostream>
 
 void {self.project_file_name}::hello() {{
@@ -65,17 +64,14 @@ void {self.project_file_name}::hello() {{
                 print(f"Dependency on {dependency['link']}")
                 raise_if_invalid_dependency(dependency, parsed_dirs)
 
-                link_directories_commands.extend(
-                    [f"include_directories(${{PROJECT_SOURCE_DIR}}/{get_include_library_of_directory(d)})"
-                     for d in parsed_dirs
-                     if d.description["type"] and
-                        "include" in d.description and
-                        d.description["include"] == "true" and
-                        d.get_path_without_project_root() == dependency['link']])
-                link_directories_commands.append(f"link_directories(${{PROJECT_SOURCE_DIR}}/{dependency['link']})")
+                link_directories_commands.extend(self.build_include_directories_for_dependency(
+                    parsed_dirs, dependency))
+                link_directories_commands.append(
+                    f"link_directories(${{PROJECT_SOURCE_DIR}}/{dependency['link']})")
 
             else:
-                print(f"Dependency on {dependency['link']} has an unsupported type: {dependency['type']}")
+                print(f"Dependency on {dependency['link']} has an unsupported type: \
+{dependency['type']}")
         executable_command = f"add_executable(myProject_{tail} ${{SOURCES}})" if executable else ""
         library_command = ""
         if library:
@@ -85,7 +81,7 @@ void {self.project_file_name}::hello() {{
         include_dependent_libraries_command = "\n".join(include_dependent_libraries_commands)
 
         content = \
-f"""set(BINARY ${{CMAKE_PROJECT_NAME}}_{tail})
+            f"""set(BINARY ${{CMAKE_PROJECT_NAME}}_{tail})
 
 {link_directories_command}
 
@@ -99,6 +95,15 @@ set(SOURCES ${{SOURCES}})
 {library_command}
 """
         return f'{self.path}/CMakeLists.txt', content
+
+    def build_include_directories_for_dependency(self, parsed_dirs, dependency):
+        return [f"include_directories(${{PROJECT_SOURCE_DIR}}/" \
+                f"{get_include_library_of_directory(d)})"
+                for d in parsed_dirs
+                if d.description["type"] and
+                "include" in d.description and
+                d.description["include"] == "true" and
+                d.get_path_without_project_root() == dependency['link']]
 
 
 def raise_if_invalid_dependency(dependency, parsed_dirs):
