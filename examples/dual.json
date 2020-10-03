@@ -1,5 +1,6 @@
 {
 	"projectName": "Dual",
+	"c++Standard": "17",
 	"directories": [{
 			"name": "executable",
 			"type": "intermediate",

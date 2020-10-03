@@ -83,15 +83,19 @@ def collect_cmake_subdirectories(directories, name="", paths=None):
     return paths
 
 
-def create_main_cmakelists(output_root, project_directory_name, subdirectories):
+def create_main_cmakelists(output_root, project_directory_name, subdirectories, cpp_version):
     add_subdirectories_commands = ""
+    if cpp_version is None:
+        cpp_version = "17"
+    if cpp_version not in ["98", "11", "14", "17", "20"]:
+        raise ValueError(f"{cpp_version} is not among the supported C++ versions")
     for subdirectory in subdirectories:
         add_subdirectories_commands += f'add_subdirectory("{subdirectory}")' + "\n"
 
         content = \
             f"""cmake_minimum_required(VERSION 3.10)
 project({project_directory_name})
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD {cpp_version})
 
 {add_subdirectories_commands.strip()}
 """
