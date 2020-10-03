@@ -8,13 +8,13 @@ class TestDirectory(directory.Directory):
     """
     This class creates a test module of a Cmake project
     """
+
     def __init__(self, project_home, path, description, project_file_name, dependencies):
-        directory.Directory.__init__(self,
-                                     project_home,
-                                     path,
-                                     description,
-                                     project_file_name,
-                                     dependencies)
+        super().__init__(project_home,
+                         path,
+                         description,
+                         project_file_name,
+                         dependencies)
 
     def create(self, _):
         """

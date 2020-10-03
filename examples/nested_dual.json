@@ -1,5 +1,6 @@
 {
 	"projectName": "NestedDual",
+	"c++Standard": "17",
 	"directories": [{
 		"name": "common_root",
 		"type": "intermediate",

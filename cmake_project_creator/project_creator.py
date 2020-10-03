@@ -48,14 +48,15 @@ def create_plumbing(output_root, path, subdirs, parsed_directories):
         for sd in subdirs if 'test' in sd)
     runtest = f"({runtest})" if runtest else ""
 
-    with open(f'{os.path.join(output_root, path)}/runTests.sh', "w") as runTests:
-        runTests.write(
+    with open(f'{os.path.join(output_root, path)}/runTests.sh', "w") as run_tests:
+        run_tests.write(
             f"""CURRENT_DIR=`pwd`
-cd build && rm -rf * && {(conan_install + "&&") if conan_install else ""} cmake .. && make {"&& " + runtest if runtest else ""}
+cd build && rm -rf * && {(conan_install + " &&") if conan_install else ""} \
+cmake .. && make {"&& " + runtest if runtest else ""}
 cd "${{CURRENT_DIR}}"
 """)
-    st = os.stat(f'{os.path.join(output_root, path)}/runTests.sh')
-    os.chmod(f'{os.path.join(output_root, path)}/runTests.sh', st.st_mode | stat.S_IEXEC)
+    file_stats = os.stat(f'{os.path.join(output_root, path)}/runTests.sh')
+    os.chmod(f'{os.path.join(output_root, path)}/runTests.sh', file_stats.st_mode | stat.S_IEXEC)
 
     if is_conan:
         with open(f'{os.path.join(output_root, path)}/conanfile.txt', "w") as conanfile:
@@ -83,15 +84,19 @@ def collect_cmake_subdirectories(directories, name="", paths=None):
     return paths
 
 
-def create_main_cmakelists(output_root, project_directory_name, subdirectories):
+def create_main_cmakelists(output_root, project_directory_name, subdirectories, cpp_version):
     add_subdirectories_commands = ""
+    if cpp_version is None:
+        cpp_version = "17"
+    if cpp_version not in ["98", "11", "14", "17", "20"]:
+        raise ValueError(f"{cpp_version} is not among the supported C++ versions")
     for subdirectory in subdirectories:
         add_subdirectories_commands += f'add_subdirectory("{subdirectory}")' + "\n"
 
         content = \
             f"""cmake_minimum_required(VERSION 3.10)
 project({project_directory_name})
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD {cpp_version})
 
 {add_subdirectories_commands.strip()}
 """
@@ -138,8 +143,8 @@ def collect_conan_dependencies(parsed_directories):
 def cleanup_project_folder(project_directory):
     try:
         shutil.rmtree(project_directory)
-    except Exception as e:
-        print(f"Cleanup of {project_directory} failed due to {e}")
+    except Exception as exception:
+        print(f"Cleanup of {project_directory} failed due to {exception}")
 
 
 def prepare_build_directory(project_directory):
@@ -164,22 +169,25 @@ def run():
     project_file_name = project_description['projectName'].capitalize()
 
     if arguments.cleanup:
-        cleanup_project_folder(os.path.join(arguments.output_root, project_dir_name))
+        cleanup_project_folder(os.path.join(output_root, project_dir_name))
 
-    prepare_build_directory(os.path.join(arguments.output_root, project_dir_name))
+    prepare_build_directory(os.path.join(output_root, project_dir_name))
 
     cmake_subdirectories = collect_cmake_subdirectories(project_description['directories'])
     print(f"The identified sub cmake projects are {cmake_subdirectories}")
 
-    write_file(*create_main_cmakelists(arguments.output_root,
+    cpp_version = project_description["c++Standard"] \
+        if "c++Standard" in project_description else None
+    write_file(*create_main_cmakelists(output_root,
                                        project_dir_name,
-                                       cmake_subdirectories))
+                                       cmake_subdirectories,
+                                       cpp_version))
 
     parsed_directories = parse_directories(project_description['directories'],
-                                           arguments.output_root,
+                                           output_root,
                                            project_dir_name,
                                            project_file_name)
-    create_plumbing(arguments.output_root,
+    create_plumbing(output_root,
                     project_dir_name,
                     cmake_subdirectories,
                     parsed_directories)

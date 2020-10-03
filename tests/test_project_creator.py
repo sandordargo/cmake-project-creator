@@ -138,7 +138,12 @@ def test_conflicting_conan_deps():
     print(project_creator.collect_conan_dependencies(parsed_directories))
 
 
-def test_create_main_cmakelists():
+@raises(ValueError)
+def test_unsupported_cpp_standard():
+    _, _ = project_creator.create_main_cmakelists("projects_root", "dummy",
+                                                  ["src", "test"], "12")
+
+def test_create_main_cmakelists_default_version():
     expected = \
         """cmake_minimum_required(VERSION 3.10)
 project(dummy)
@@ -148,7 +153,23 @@ add_subdirectory("src")
 add_subdirectory("test")
 """
     actual_path, actual_content = project_creator.create_main_cmakelists("projects_root", "dummy",
-                                                                         ["src", "test"])
+                                                                         ["src", "test"], None)
+
+    assert actual_content == expected
+    assert actual_path == "projects_root/dummy/CMakeLists.txt"
+
+
+def test_create_main_cmakelists():
+    expected = \
+        """cmake_minimum_required(VERSION 3.10)
+project(dummy)
+set(CMAKE_CXX_STANDARD 14)
+
+add_subdirectory("src")
+add_subdirectory("test")
+"""
+    actual_path, actual_content = project_creator.create_main_cmakelists("projects_root", "dummy",
+                                                                         ["src", "test"], "14")
 
     assert actual_content == expected
     assert actual_path == "projects_root/dummy/CMakeLists.txt"
