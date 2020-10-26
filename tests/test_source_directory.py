@@ -174,6 +174,48 @@ def test_create_cmakelists_conan_error():
     source_dir.create_cmakelists([])
 
 
+def test_custom_library_name():
+    description = {
+        "name": "src",
+        "type": "source",
+        "library": "static",
+        "executable": "true",
+        "executable_name": "dual_lib_custom_executable",
+        "library_name": "dualCustomLibraryName",
+        "include": "true",
+        "dependencies": [],
+        "subdirectories": []
+    }
+
+    source_dir = source_directory.SourceDirectory("projects_root",
+                                                  "root/path",
+                                                  description,
+                                                  "DummyProject",
+                                                  [])
+    assert source_dir.build_library_command().startswith("add_library(dualCustomLibraryName STATIC") == True
+
+
+def test_custom_executable_name():
+    description = {
+        "name": "src",
+        "type": "source",
+        "library": "static",
+        "executable": "true",
+        "executable_name": "dual_lib_custom_executable",
+        "library_name": "dualCustomLibraryName",
+        "include": "true",
+        "dependencies": [],
+        "subdirectories": []
+    }
+
+    source_dir = source_directory.SourceDirectory("projects_root",
+                                                  "root/path",
+                                                  description,
+                                                  "DummyProject",
+                                                  [])
+    assert source_dir.build_executable_command().startswith("add_executable(dual_lib_custom_executable") == True
+
+
 def test_string_representation():
     description = {
         "name": "src",

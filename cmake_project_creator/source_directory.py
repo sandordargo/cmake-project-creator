@@ -52,10 +52,7 @@ void {self.project_file_name}::hello() {{
         return f'{self.path}/{self.project_file_name}.cpp', content
 
     def create_cmakelists(self, parsed_dirs):
-        tail = directory.Directory.get_name_suffix(self)
         dependencies = self.description["dependencies"]
-        library = self.description["library"] if "library" in self.description else None
-        executable = self.description["executable"] if "executable" in self.description else "false"
 
         link_directories_commands = []
         include_dependent_libraries_commands = []
@@ -72,16 +69,12 @@ void {self.project_file_name}::hello() {{
             else:
                 print(f"Dependency on {dependency['link']} has an unsupported type: \
 {dependency['type']}")
-        executable_command = f"add_executable(myProject_{tail} ${{SOURCES}})" if executable else ""
-        library_command = ""
-        if library:
-            library_command = f"add_library(${{BINARY}}_lib {library.upper()} ${{SOURCES}})"
 
         link_directories_command = "\n".join(link_directories_commands)
         include_dependent_libraries_command = "\n".join(include_dependent_libraries_commands)
 
         content = \
-            f"""set(BINARY ${{CMAKE_PROJECT_NAME}}_{tail})
+            f"""set(BINARY ${{CMAKE_PROJECT_NAME}}_{directory.Directory.get_name_suffix(self)})
 
 {link_directories_command}
 
@@ -91,10 +84,31 @@ void {self.project_file_name}::hello() {{
 file(GLOB SOURCES *.cpp)
 set(SOURCES ${{SOURCES}})
 
-{executable_command}
-{library_command}
+{self.build_executable_command()}
+{self.build_library_command()}
 """
         return f'{self.path}/CMakeLists.txt', content
+
+    def build_executable_command(self):
+        executable = self.description["executable"] if "executable" in self.description else "false"
+        if not executable:
+            return ""
+        is_custom_name_defined = "executable_name" in self.description
+        executable_name = self.description["executable_name"] if is_custom_name_defined \
+            else f"myProject_{directory.Directory.get_name_suffix(self)}"
+
+        executable_command = f"add_executable({executable_name} ${{SOURCES}})"
+        return executable_command
+
+    def build_library_command(self):
+        library = self.description["library"] if "library" in self.description else None
+        if not library:
+            return ""
+        is_custom_name_defined = "library_name" in self.description
+        library_name = self.description["library_name"] if is_custom_name_defined \
+            else f"${{BINARY}}_lib"
+        library_command = f"add_library({library_name} {library.upper()} ${{SOURCES}})"
+        return library_command
 
     def build_include_directories_for_dependency(self, parsed_dirs, dependency):
         return [f"include_directories(${{PROJECT_SOURCE_DIR}}/" \
