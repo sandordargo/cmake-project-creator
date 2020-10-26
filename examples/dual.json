@@ -41,6 +41,8 @@
 					"type": "source",
 					"library": "static",
 					"executable": "true",
+					"executable_name": "dual_lib_custom_executable",
+					"library_name": "dualCustomLibraryName",
 					"include": "true",
 					"dependencies": [],
 					"subdirectories": []
