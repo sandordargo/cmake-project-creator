@@ -95,7 +95,7 @@ set(SOURCES ${{SOURCES}})
             return ""
         is_custom_name_defined = "executable_name" in self.description
         executable_name = self.description["executable_name"] if is_custom_name_defined \
-            else f"myProject_{directory.Directory.get_name_suffix(self)}"
+            else f"{self.project_file_name}_{directory.Directory.get_name_suffix(self)}"
 
         executable_command = f"add_executable({executable_name} ${{SOURCES}})"
         return executable_command
