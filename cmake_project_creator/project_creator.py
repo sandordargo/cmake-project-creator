@@ -16,6 +16,13 @@ def parse_arguments():
                         dest='description',
                         help='Project description'
                         )
+    parser.add_argument('-n', '--name',
+                        type=str,
+                        dest='name',
+                        help="You can override the project's name that is used "
+                             "as the name of the containing folder and throughout "
+                             "the Cmakelists files"
+                        )
     parser.add_argument('-o', '--output',
                         default="generated_projects",
                         type=str,
@@ -165,8 +172,8 @@ def run():
 
     output_root = arguments.output_root
 
-    project_dir_name = project_description['projectName']
-    project_file_name = project_description['projectName'].capitalize()
+    project_dir_name = arguments.name if arguments.name else project_description['projectName']
+    project_file_name = project_dir_name.capitalize()
 
     if arguments.cleanup:
         cleanup_project_folder(os.path.join(output_root, project_dir_name))

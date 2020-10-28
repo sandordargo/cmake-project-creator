@@ -143,7 +143,7 @@ include_directories(../include)
 file(GLOB SOURCES *.cpp)
 set(SOURCES ${SOURCES})
 
-add_executable(myProject_path ${SOURCES})
+add_executable(DummyProject_path ${SOURCES})
 
 """
     actual_path, actual_content = source_dir.create_cmakelists([])
