@@ -24,7 +24,7 @@ You have the following predefined schemas shipped with project_creator.
 
 ### The `single` directory project
 
-Invoke this with `-s single`. It will create a project with one include, one source and one test folder. GTest will be included for unit testing through Conan.
+Invoke this with `-d single`. It will create a project with one include, one source and one test folder. GTest will be included for unit testing through Conan.
 
 ```
 myProject
@@ -36,7 +36,7 @@ myProject
 
 ### The `dual` directory project
 
-Invoke the tool with `-s dual` and the following project will be generated:
+Invoke the tool with `-d dual` and the following project will be generated:
 
 ```
 myProject
@@ -56,7 +56,7 @@ GTest will be included for unit testing through Conan.
 
 ### The `nested_dual` directory project
 
-Invoke the tool with `-s nested_dual` and the following project will be generated:
+Invoke the tool with `-d nested_dual` and the following project will be generated:
 
 ```
 myProject
