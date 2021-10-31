@@ -2,7 +2,7 @@
 
 ## Cmake Project Creator
 
-Cmake Project Creator helps you generate a new C++ project. Instead of writing the Cmakefiles and create all the folder by hand, you can either
+Cmake Project Creator helps you generate a new C++ project. Instead of writing the Cmakefiles and creating all the folders by hand, you can either
 * generate a project from an already existing description
 * write a new description file yourself
 
@@ -73,7 +73,7 @@ myProject
 
 The `executable` sub-directory will include `library` sub-directory as a dependency and will also have a `main.cpp` as such an executable. The `library` is just a static library.
 
-So what is the difference compared to the `dual` project. Not much, it's just that the subdirectories are nested in a new common root. This is more to show you an example, how it is possible. You can checked description in `examples/sample3.json`. 
+So what is the difference compared to the `dual` project? Not much, it's just that the subdirectories are nested in a new common root. This is more to show you an example, how it is possible. You can check the description in `examples/sample3.json`. 
 
 GTest will be included for unit testing through Conan.
 
@@ -81,8 +81,8 @@ GTest will be included for unit testing through Conan.
 
 First of all, project descriptions are written in JSON format.
 
-In the root of the JSON, you'll have to specify the `projectName` attribute, that will be used both for teh directory name where the project will be created and evidently it will be the name of Cmake project.
-Then you have do specify an array of `directories`.
+In the root of the JSON, you'll have to specify the `projectName` attribute, which will be used both for the directory name where the project will be created and evidently it will be the name of the Cmake project.
+Then you have to specify an array of `directories`.
 
 
 ### Directory object
@@ -99,30 +99,30 @@ The `type` attribute can take the following values:
 - `test` indicating that it will contain unit test code
 - `intermediate` indicating that it will only contain other subdirectories  
 
-In the subdirectories array you can list the other `directory` objects to be put nested in the given `directory`.
+In the subdirectories array, you can list the other `directory` objects to be put nested in the given `directory`.
 
 #### Optional elements
 
 A directory object can have the following optional elements:
 
-- `library` indicating whether a given component should be delivered as a library. Only `source` type directories should use this option. It's values can be `null`, `STATIC` or `SHARED`
+- `library` indicating whether a given component should be delivered as a library. Only `source` type directories should use this option. Its values can be `null`, `STATIC` or `SHARED`
 - `executable` indicating whether a given component should have an executable, if set to `true`, a `main.cpp` will be generated. Only `source` type directories should use this option.
 - `include` indicating whether a given `source` component has a corresponding `include` counterpart or not. Only `source` type directories should use this option.
-- `dependencies` array contain all the dependencies of the given component
+- `dependencies` array containing all the dependencies of the given component
 
 ### Dependency objects
 
 The `dependency` object is to describe a dependency of the enclosing component. It has 2 mandatory attributes and 1 optional:
 
 #### Mandatory elements
-- `type` indicating whether the dependency is of another directory of the project (`internal`) or if it's an external one. Among external ones for the time being only `conan` is supported. 
-- `name` indicating the name of the dependency, in case of internal ones it should be te relative path of the depended directory including the project root. (E.g. `common_root/executable/library`)
+- `type` indicating whether the dependency is of another directory of the project (`internal`) or if it's an external one. Among external ones, for the time being, only `conan` is supported. 
+- `name` indicating the name of the dependency, in case of internal ones it should be the relative path of the depended directory including the project root. (E.g. `common_root/executable/library`)
 
 #### Optional elements
 - `version` is optional and has no role for `internal` dependencies, but for `conan` type dependencies it indicates the version of the component we want to include and the format must follow the Conan syntax. You can both use specific versions or [version ranges](https://docs.conan.io/en/latest/versioning/version_ranges.html) 
 
 ## Hot to contribute?
 
-In any case, please check the Github issues, maybe there is already an item, already a discussion concerning your idea. If that's not the case, open an issue and let's discuss there.
+In any case, please check the Github issues, maybe there is already an item, already a discussion concerning your idea. If that's not the case, open an issue and let's discuss it there.
 
-In terms of coding guidelines, I follow the [PEP 8 Style guide for Pyhon](https://www.python.org/dev/peps/pep-0008/). Test are must be provided.
+In terms of coding guidelines, I follow the [PEP 8 Style guide for Pyhon](https://www.python.org/dev/peps/pep-0008/). Tests are must be provided.
