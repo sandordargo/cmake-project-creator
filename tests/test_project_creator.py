@@ -159,6 +159,24 @@ add_subdirectory("test")
     assert actual_path == "projects_root/dummy/CMakeLists.txt"
 
 
+def test_create_main_cmakelists_with_compiler_options():
+    expected = \
+        """cmake_minimum_required(VERSION 3.10)
+project(dummy)
+set(CMAKE_CXX_STANDARD 17)
+add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+
+add_subdirectory("src")
+add_subdirectory("test")
+"""
+    actual_path, actual_content = project_creator.create_main_cmakelists("projects_root", "dummy",
+                                                                         ["src", "test"], None, ["-Wall", "-Wextra", "-Wpedantic", "-Werror"])
+
+    assert actual_content == expected, "%r != %r" % (actual_content, expected)
+    assert actual_path == "projects_root/dummy/CMakeLists.txt"
+
+
+
 def test_create_main_cmakelists():
     expected = \
         """cmake_minimum_required(VERSION 3.10)
@@ -173,3 +191,17 @@ add_subdirectory("test")
 
     assert actual_content == expected
     assert actual_path == "projects_root/dummy/CMakeLists.txt"
+
+def test_collect_compiler_options():
+    project_description = {	"compilerOptions": [
+		"-Wall", "-Wextra", "-Wpedantic", "-Werror"
+	]}
+    expected = ["-Wall", "-Wextra", "-Wpedantic", "-Werror"]
+
+    assert project_creator.collect_compiler_options(project_description) == expected
+
+def test_collect_compiler_options_missing_input():
+    project_description = {}
+    expected = []
+
+    assert project_creator.collect_compiler_options(project_description) == expected

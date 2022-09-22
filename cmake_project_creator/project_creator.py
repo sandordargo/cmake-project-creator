@@ -91,12 +91,20 @@ def collect_cmake_subdirectories(directories, name="", paths=None):
     return paths
 
 
-def create_main_cmakelists(output_root, project_directory_name, subdirectories, cpp_version):
+def create_main_cmakelists(output_root, project_directory_name, subdirectories, cpp_version=None, compiler_options_list=None):
     add_subdirectories_commands = ""
     if cpp_version is None:
         cpp_version = "17"
     if cpp_version not in ["98", "11", "14", "17", "20"]:
         raise ValueError(f"{cpp_version} is not among the supported C++ versions")
+    compiler_options_list = compiler_options_list or []
+
+    add_compiler_options_command = ""
+    if compiler_options_list:
+        add_compiler_options_command = "add_compile_options("
+        add_compiler_options_command += " ".join(compiler_options_list)
+        add_compiler_options_command += ")"
+
     for subdirectory in subdirectories:
         add_subdirectories_commands += f'add_subdirectory("{subdirectory}")' + "\n"
 
@@ -104,7 +112,13 @@ def create_main_cmakelists(output_root, project_directory_name, subdirectories, 
             f"""cmake_minimum_required(VERSION 3.10)
 project({project_directory_name})
 set(CMAKE_CXX_STANDARD {cpp_version})
+"""
 
+    if add_compiler_options_command.strip():
+        content += f"{add_compiler_options_command.strip()}\n"
+
+    content += \
+f"""
 {add_subdirectories_commands.strip()}
 """
     return f'{os.path.join(output_root, project_directory_name)}/CMakeLists.txt', content
@@ -146,6 +160,10 @@ def collect_conan_dependencies(parsed_directories):
                     conan_dependencies[dependency.name] = dependency.version
     return conan_dependencies
 
+def collect_compiler_options(project_description):
+    if "compilerOptions" not in project_description:
+        return []
+    return project_description["compilerOptions"]
 
 def cleanup_project_folder(project_directory):
     try:
@@ -188,7 +206,8 @@ def run():
     write_file(*create_main_cmakelists(output_root,
                                        project_dir_name,
                                        cmake_subdirectories,
-                                       cpp_version))
+                                       cpp_version,
+                                       collect_compiler_options(project_description)))
 
     parsed_directories = parse_directories(project_description['directories'],
                                            output_root,
