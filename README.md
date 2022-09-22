@@ -24,7 +24,19 @@ You have the following predefined schemas shipped with project_creator.
 
 ### The `single` directory project
 
-Invoke this with `-d single`. It will create a project with one include, one source and one test folder. GTest will be included for unit testing through Conan.
+Invoke this with `-d examples/single.json`. It will create a project with one include, one source and one test folder. GTest will be included for unit testing through Conan.
+
+```
+myProject
+|_ include
+|_ src
+|_ test
+
+``` 
+
+### The `single` directory project with compiler options
+
+Invoke this with `-d examples/single_with_compiler_options.json`. Like the `single.json`, it will create a project with one include, one source and one test folder. More than that, it will define the following compiler options on a project level: `-Wall -Wextra -Wpedantic -Werror`.
 
 ```
 myProject
@@ -36,7 +48,7 @@ myProject
 
 ### The `dual` directory project
 
-Invoke the tool with `-d dual` and the following project will be generated:
+Invoke the tool with `-d examples/dual.json` and the following project will be generated:
 
 ```
 myProject
@@ -56,7 +68,7 @@ GTest will be included for unit testing through Conan.
 
 ### The `nested_dual` directory project
 
-Invoke the tool with `-d nested_dual` and the following project will be generated:
+Invoke the tool with `-d examples/nested_dual.json` and the following project will be generated:
 
 ```
 myProject
@@ -73,7 +85,7 @@ myProject
 
 The `executable` sub-directory will include `library` sub-directory as a dependency and will also have a `main.cpp` as such an executable. The `library` is just a static library.
 
-So what is the difference compared to the `dual` project? Not much, it's just that the subdirectories are nested in a new common root. This is more to show you an example, how it is possible. You can check the description in `examples/sample3.json`. 
+So what is the difference compared to the `dual` project? Not much, it's just that the subdirectories are nested in a new common root. This is more to show you an example, how it is possible. You can check the description in `examples/nested_dual.json`. 
 
 GTest will be included for unit testing through Conan.
 
@@ -84,6 +96,16 @@ First of all, project descriptions are written in JSON format.
 In the root of the JSON, you'll have to specify the `projectName` attribute, which will be used both for the directory name where the project will be created and evidently it will be the name of the Cmake project.
 Then you have to specify an array of `directories`.
 
+
+### The root elements
+
+There are two mandatory elements:
+- `projectName` setting the project name
+- `directories` describing the directory structure of the project
+
+The following items are optional:
+- `c++Standard` setting the standard to compile against. If missing, it defaults to *17*. Possible values are: *98*, *11*, *14*, *17*, *20*.
+- `compilerOptions` setting extra compiler options. This field takes an array of strings, for example: `"compilerOptions": ["-Wall", "-Wextra", "-Wpedantic", "-Werror"]`.
 
 ### Directory object
 
@@ -121,7 +143,7 @@ The `dependency` object is to describe a dependency of the enclosing component. 
 #### Optional elements
 - `version` is optional and has no role for `internal` dependencies, but for `conan` type dependencies it indicates the version of the component we want to include and the format must follow the Conan syntax. You can both use specific versions or [version ranges](https://docs.conan.io/en/latest/versioning/version_ranges.html) 
 
-## Hot to contribute?
+## How to contribute?
 
 In any case, please check the Github issues, maybe there is already an item, already a discussion concerning your idea. If that's not the case, open an issue and let's discuss it there.
 
