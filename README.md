@@ -7,20 +7,24 @@ Cmake Project Creator helps you generate a new C++ project. Instead of writing t
 * write a new description file yourself
 
 ## Requirements
+You need the following software installed on your laptop
+- [Python 3.7 or higher](https://www.python.org/downloads/)
+- [CMake 3](https://cmake.org/download/)
+- [Conan](https://docs.conan.io/en/latest/installation.html)
 
 ## How to use it?
 
 Call `./create_cmake_project.py --help` to print the help message.
 
-Briefly, you can call the project_creator with one of the predefined options, or you can pass in your own project description.
+Briefly, you can call the `project_creator` with one of the predefined options, or you can pass in your own project description.
 
-You should also pass in the path with `-p` or `--path` where your new project should be generated. If it's not passed then the project will be created under the generated_projects directory.
+You should also pass in the path with `-o` or `--output` where your new project should be generated. If it's not passed then the project will be created under the generated_projects directory.
 
 Once a project is generated, navigate to the root of the freshly created project and call `./runTest.sh` to launch the build and the unit tests - if any. Where a test directory is defined, a failing unit test is generated. 
 
 ## Predefined schemas
 
-You have the following predefined schemas shipped with project_creator. 
+You have the following predefined schemas shipped with `project_creator`. 
 
 ### The `single` directory project
 
@@ -87,7 +91,7 @@ The `executable` sub-directory will include `library` sub-directory as a depende
 
 So what is the difference compared to the `dual` project? Not much, it's just that the subdirectories are nested in a new common root. This is more to show you an example, how it is possible. You can check the description in `examples/nested_dual.json`. 
 
-GTest will be included for unit testing through Conan.
+GTest will be included for unit testing with the help of Conan.
 
 ## How to write new project descriptions?
 
@@ -95,7 +99,6 @@ First of all, project descriptions are written in JSON format.
 
 In the root of the JSON, you'll have to specify the `projectName` attribute, which will be used both for the directory name where the project will be created and evidently it will be the name of the Cmake project.
 Then you have to specify an array of `directories`.
-
 
 ### The root elements
 
@@ -147,4 +150,4 @@ The `dependency` object is to describe a dependency of the enclosing component. 
 
 In any case, please check the Github issues, maybe there is already an item, already a discussion concerning your idea. If that's not the case, open an issue and let's discuss it there.
 
-In terms of coding guidelines, I follow the [PEP 8 Style guide for Pyhon](https://www.python.org/dev/peps/pep-0008/). Tests are must be provided.
+In terms of coding guidelines, I follow the [PEP 8 Style guide for Pyhon](https://www.python.org/dev/peps/pep-0008/). Tests must be provided.
