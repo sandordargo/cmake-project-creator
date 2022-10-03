@@ -137,6 +137,9 @@ def test_create_cmakelists_conan():
 
 
 
+
+
+
 include_directories(../include)
 
 
@@ -149,7 +152,7 @@ add_executable(DummyProject_path ${SOURCES})
     actual_path, actual_content = source_dir.create_cmakelists([])
     print(actual_content)
     assert 'root/path/CMakeLists.txt' == actual_path
-    assert expected == actual_content
+    assert expected == actual_content, "%r != %r" % (expected, actual_content)
 
 
 @raises(ValueError)

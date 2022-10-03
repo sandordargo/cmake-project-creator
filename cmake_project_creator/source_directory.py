@@ -24,7 +24,7 @@ class SourceDirectory(directory.Directory):
         ]
 
         for file_creator in file_creators:
-            self.write_file(*file_creator(parsed_dirs))
+            self.write_file(*file_creator(parsed_dirs.values()))
 
     def create_main(self, _):
         if self.description['executable'] == 'true':
@@ -54,6 +54,8 @@ void {self.project_file_name}::hello() {{
     def create_cmakelists(self, parsed_dirs):
         dependencies = self.description["dependencies"]
 
+        is_conan = any(dependency["type"] == "conan" for dependency in self.description["dependencies"])
+
         link_directories_commands = []
         include_dependent_libraries_commands = []
         for dependency in dependencies:
@@ -66,6 +68,8 @@ void {self.project_file_name}::hello() {{
                 link_directories_commands.append(
                     f"link_directories(${{PROJECT_SOURCE_DIR}}/{dependency['link']})")
 
+            elif dependency['type'] == "conan":
+                pass
             else:
                 print(f"Dependency on {dependency['link']} has an unsupported type: \
 {dependency['type']}")
@@ -75,6 +79,9 @@ void {self.project_file_name}::hello() {{
 
         content = \
             f"""set(BINARY ${{CMAKE_PROJECT_NAME}}_{directory.Directory.get_name_suffix(self)})
+
+{"include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)" if is_conan else ""}
+{"conan_basic_setup()  # Prepares the CMakeList.txt for Conan." if is_conan else ""}
 
 {link_directories_command}
 
@@ -104,10 +111,17 @@ set(SOURCES ${{SOURCES}})
         library = self.description["library"] if "library" in self.description else None
         if not library:
             return ""
+        is_custom_executable_name_defined = "executable_name" in self.description
+        executable_name = self.description["executable_name"] if is_custom_executable_name_defined \
+            else f"{self.project_file_name}_{directory.Directory.get_name_suffix(self)}"
+
         is_custom_name_defined = "library_name" in self.description
         library_name = self.description["library_name"] if is_custom_name_defined \
             else f"${{BINARY}}_lib"
-        library_command = f"add_library({library_name} {library.upper()} ${{SOURCES}})"
+
+        library_command = \
+            f"""add_library({library_name} {library.upper()} ${{SOURCES}})
+target_link_libraries({executable_name} ${{BINARY}}_lib)"""
         return library_command
 
     def build_include_directories_for_dependency(self, parsed_dirs, dependency):
