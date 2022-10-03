@@ -16,7 +16,7 @@ class TestDirectory(directory.Directory):
                          project_file_name,
                          dependencies)
 
-    def create(self, _):
+    def create(self, parsed_dirs):
         """
         Creates all the files needed for a test module
         """
@@ -28,13 +28,20 @@ class TestDirectory(directory.Directory):
             self.create_main
         ]
         for file_creator in file_creators:
-            self.write_file(*file_creator())
+            self.write_file(*file_creator(parsed_dirs))
 
-    def create_cmakelists(self):
+    def create_cmakelists(self, parsed_dirs):
         """
         :return: the path and content of CMakelists.txt in a test module
         """
         is_conan = any(dependency.type == "conan" for dependency in self.dependencies)
+        parent_path_to_look_for = self.path[:self.path.rfind('/')]
+
+        is_there_source_dir = any(k.startswith(parent_path_to_look_for) and  v.description["type"] == "source" and v.description["library"] is not None 
+                                  for k, v in parsed_dirs.items())
+
+        src_lib_to_link = "${CMAKE_PROJECT_NAME}_src_lib" if is_there_source_dir else ""
+
         tail = directory.Directory.get_name_suffix(self)
 
         return f'{self.path}/CMakeLists.txt', \
@@ -49,12 +56,12 @@ set(SOURCES ${{TEST_SOURCES}})
 include_directories(../include)
 
 add_executable(${{BINARY}} ${{TEST_SOURCES}})
-{"target_link_libraries(${BINARY} PUBLIC ${CONAN_LIBS})" if is_conan else ""}
+{str("target_link_libraries(${BINARY} PUBLIC ${CONAN_LIBS} " + src_lib_to_link).strip() + ")" if is_conan else ""}
 
 add_test(NAME ${{BINARY}} COMMAND ${{BINARY}})
 """
 
-    def create_source_file(self):
+    def create_source_file(self, _):
         """
         :return: the path and content of cpp file in a test module
         """
@@ -67,7 +74,7 @@ TEST(blaTest, test1) {{
 }}
 """
 
-    def create_main(self):
+    def create_main(self, _):
         """
         :return: the path and content of main.cpp in a test module
         """

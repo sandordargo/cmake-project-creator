@@ -46,6 +46,30 @@ myProject
 
 ``` 
 
+### The `single` directory project with boost
+
+Invoke this with `-d examples/single_lib.json`. Like the `single.json`, it will create a project with one include, one source and one test folder. More than that, it doesn't only deliver an executable, but it also creates a shared library.
+
+```
+myProject
+|_ include
+|_ src
+|_ test
+
+```
+
+### The `single` directory project with boost
+
+Invoke this with `-d examples/single_with_boost.json`. Like the `single.json`, it will create a project with one include, one source and one test folder. More than that, it includes `boost` as a dependency for the source directory and `gtest` for tests.
+
+```
+myProject
+|_ include
+|_ src
+|_ test
+
+```
+
 ### The `dual` directory project
 
 Invoke the tool with `-d examples/dual.json` and the following project will be generated:
@@ -62,7 +86,7 @@ myProject
     |_ test
 ```
 
-The `executable` sub-directory will include `library` sub-directory as a dependency and will also have a `main.cpp` as such an executable. The `library` is just a static library. 
+The `executable` sub-directory will include `library` sub-directory as a dependency and will also have a `main.cpp` as such an executable. The `library` is just a static library.
 
 GTest will be included for unit testing through Conan.
 
@@ -127,7 +151,7 @@ In the subdirectories array, you can list the other `directory` objects to be pu
 
 A directory object can have the following optional elements:
 
-- `library` indicating whether a given component should be delivered as a library. Only `source` type directories should use this option. Its values can be `null`, `STATIC` or `SHARED`
+- `library` indicating whether a given component should be delivered as a library. Only `source` type directories should use this option. Its values can be `null`, `STATIC` or `SHARED`. Beware that if you decide to go with `null`, you want to be able to link it in unittests. I recommend delivering a library if you want to have tests. [More info on the topic here.](https://stackoverflow.com/a/52105591/3238101)
 - `executable` indicating whether a given component should have an executable, if set to `true`, a `main.cpp` will be generated. Only `source` type directories should use this option.
 - `include` indicating whether a given `source` component has a corresponding `include` counterpart or not. Only `source` type directories should use this option.
 - `dependencies` array containing all the dependencies of the given component

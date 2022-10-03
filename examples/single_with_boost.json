@@ -1,0 +1,33 @@
+{
+	"projectName": "MyTestProjectSingle",
+	"c++Standard": "17",
+	"directories": [{
+			"name": "src",
+			"type": "source",
+			"library": "shared",
+			"executable": "true",
+			"include": "true",
+			"dependencies": [{
+				"type": "conan",
+				"name": "boost",
+				"version": "1.80.0"
+			}],
+			"subdirectories": []
+		},
+		{
+			"name": "include",
+			"type": "include",
+			"subdirectories": []
+		},
+		{
+			"name": "tests",
+			"type": "tests",
+			"dependencies": [{
+				"type": "conan",
+				"name": "gtest",
+				"version": "1.8.1"
+			}],
+			"subdirectories": []
+		}
+	]
+}

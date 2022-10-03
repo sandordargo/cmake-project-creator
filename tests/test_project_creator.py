@@ -87,8 +87,8 @@ def test_parse_directories():
         "dependencies": [],
         "subdirectories": []
     }]
-    expected = [source_directory.SourceDirectory("projects_root", "src", single_directory[0],
-                                                 "DummyProject", [])]
+    expected = {"src": source_directory.SourceDirectory("projects_root", "src", single_directory[0],
+                                                 "DummyProject", [])}
     parsed_directories = project_creator.parse_directories(single_directory,
                                                            "projects_root", "", "DummyProject")
     assert expected == parsed_directories

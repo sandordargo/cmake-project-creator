@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
     return RUN_ALL_TESTS();
 }
 """
-    actual_path, actual_content = test_dir.create_main()
+    actual_path, actual_content = test_dir.create_main({})
     assert actual_path == 'root/path/main.cpp'
     assert actual_content == expected
 
@@ -26,7 +26,7 @@ TEST(blaTest, test1) {
     ASSERT_EQ (1, 0);
 }
 """
-    actual_path, actual_content = test_dir.create_source_file()
+    actual_path, actual_content = test_dir.create_source_file({})
     assert actual_path == 'root/path/TestDummyProject.cpp'
     assert actual_content == expected
 
@@ -49,7 +49,7 @@ add_executable(${BINARY} ${TEST_SOURCES})
 
 add_test(NAME ${BINARY} COMMAND ${BINARY})
 """
-    actual_path, actual_content = test_dir.create_cmakelists()
+    actual_path, actual_content = test_dir.create_cmakelists({})
     assert actual_path == 'root/path/CMakeLists.txt'
     assert actual_content == expected
 
@@ -84,7 +84,7 @@ target_link_libraries(${BINARY} PUBLIC ${CONAN_LIBS})
 
 add_test(NAME ${BINARY} COMMAND ${BINARY})
 """
-    actual_path, actual_content = test_dir.create_cmakelists()
+    actual_path, actual_content = test_dir.create_cmakelists({})
     print(actual_content)
     assert actual_path == 'root/path/CMakeLists.txt'
     assert actual_content == expected

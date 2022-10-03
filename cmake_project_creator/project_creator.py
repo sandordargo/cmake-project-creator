@@ -44,7 +44,7 @@ def parse_arguments():
 
 
 def create_plumbing(output_root, path, subdirs, parsed_directories):
-    conan_dependencies = collect_conan_dependencies(parsed_directories)
+    conan_dependencies = collect_conan_dependencies(parsed_directories.values())
     is_conan = len(conan_dependencies) > 0
 
     conan_install = "conan install .. -s compiler.libcxx=libstdc++11" if is_conan else ""
@@ -125,26 +125,26 @@ f"""
 
 
 def parse_directories(directories, project_home, relative_root, project_file_name):
-    parsed_directories = []
+    parsed_directories = {}
     for directory in directories:
         rel_path = os.path.join(relative_root, directory['name'])
 
         if directory["type"] == "intermediate":
-            parsed_directories.extend(parse_directories(directory['subdirectories'],
+            parsed_directories.update(parse_directories(directory['subdirectories'],
                                                         project_home,
                                                         rel_path,
                                                         project_file_name))
             continue
 
-        parsed_directories.append(directory_factory.make(project_home,
+        parsed_directories[rel_path] = directory_factory.make(project_home,
                                                          rel_path,
                                                          directory,
-                                                         project_file_name))
+                                                         project_file_name)
     return parsed_directories
 
 
 def create_cpp_project(parsed_directories):
-    for directory in parsed_directories:
+    for directory in parsed_directories.values():
         directory.create(parsed_directories)
 
 
