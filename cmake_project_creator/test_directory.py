@@ -70,6 +70,8 @@ add_test(NAME ${{BINARY}} COMMAND ${{BINARY}})
 #include "{self.project_file_name}.h"
 
 TEST(blaTest, test1) {{
+    {self.project_file_name} x;
+    x.hello();
     ASSERT_EQ (1, 0);
 }}
 """
