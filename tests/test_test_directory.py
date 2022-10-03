@@ -23,6 +23,8 @@ def test_source_file():
 #include "DummyProject.h"
 
 TEST(blaTest, test1) {
+    DummyProject x;
+    x.hello();
     ASSERT_EQ (1, 0);
 }
 """
