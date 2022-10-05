@@ -15,6 +15,7 @@ class TestDirectory(directory.Directory):
                          description,
                          project_file_name,
                          dependencies)
+        self.test_framework = [dependency.name for dependency in self.dependencies][0] if self.dependencies else None
 
     def create(self, parsed_dirs):
         """
@@ -65,6 +66,13 @@ add_test(NAME ${{BINARY}} COMMAND ${{BINARY}})
         """
         :return: the path and content of cpp file in a test module
         """
+        return {
+            "gtest": self.create_gtest_source_file,
+            "catch2": self.create_catch2_source_file,
+            "unknown": self.create_nothing
+        }.get(self.test_framework, self.create_nothing)()
+
+    def create_gtest_source_file(self):
         return f'{self.path}/Test{self.project_file_name}.cpp', \
                f"""#include "gtest/gtest.h"
 #include "{self.project_file_name}.h"
@@ -76,10 +84,30 @@ TEST(blaTest, test1) {{
 }}
 """
 
+    def create_catch2_source_file(self):
+        return f'{self.path}/Test{self.project_file_name}.cpp', \
+               f"""#include <catch2/catch_test_macros.hpp>
+
+#include "{self.project_file_name}.h"
+
+TEST_CASE("blaTest", "test1") {{
+    {self.project_file_name} x;
+    x.hello();
+    REQUIRE( 1 == 0 );
+}}
+"""
+
     def create_main(self, _):
         """
         :return: the path and content of main.cpp in a test module
         """
+        return {
+            "gtest": self.create_gtest_main,
+            "catch2": self.create_nothing,
+            "unknown": self.create_nothing
+        }.get(self.test_framework, self.create_nothing)()
+
+    def create_gtest_main(self):
         content = \
             """#include "gtest/gtest.h"
 
@@ -89,3 +117,6 @@ int main(int argc, char **argv) {
 }
 """
         return f'{self.path}/main.cpp', content
+
+    def create_nothing(self):
+        return None, None
