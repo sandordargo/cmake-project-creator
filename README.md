@@ -22,11 +22,19 @@ You should also pass in the path with `-o` or `--output` where your new project 
 
 Once a project is generated, navigate to the root of the freshly created project and call `./runTest.sh` to launch the build and the unit tests - if any. Where a test directory is defined, a failing unit test is generated. 
 
+### Supported unit testing frameworks
+
+Even though you can include any unit testing framework that is available through Conan, their won't be some default failing tests generated, unless the framework is listed in this section.
+
+The following unit testing frameworks are supported:
+- [catch2](https://github.com/catchorg/Catch2)
+- [gtest](https://github.com/google/googletest)
+
 ## Predefined schemas
 
 You have the following predefined schemas shipped with `project_creator`. 
 
-### The `single` directory project
+### The `single` directory project with Gtest as a unit testing framework
 
 Invoke this with `-d examples/single.json`. It will create a project with one include, one source and one test folder. GTest will be included for unit testing through Conan.
 
@@ -38,6 +46,17 @@ myProject
 
 ``` 
 
+### The `single` directory project with Catch2 as a unit testing framework
+
+Invoke this with `-d examples/single.json`. It will create a project with one include, one source and one test folder. Catch2 will be included for unit testing through Conan.
+
+```
+myProject
+|_ include
+|_ src
+|_ test
+
+``` 
 ### The `single` directory project with compiler options
 
 Invoke this with `-d examples/single_with_compiler_options.json`. Like the `single.json`, it will create a project with one include, one source and one test folder. More than that, it will define the following compiler options on a project level: `-Wall -Wextra -Wpedantic -Werror`.
