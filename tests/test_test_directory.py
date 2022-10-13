@@ -1,5 +1,6 @@
 from cmake_project_creator import test_directory, dependency
 
+import nose.tools
 
 def test_create_main():
     test_dir = test_directory.TestDirectory("projects_root", "root/path", {}, "DummyProject", [])
@@ -12,8 +13,8 @@ int main(int argc, char **argv) {
 }
 """
     actual_path, actual_content = test_dir.create_main({})
-    assert actual_path == 'root/path/main.cpp'
-    assert actual_content == expected
+    nose.tools.eq_(actual_path, 'root/path/main.cpp')
+    nose.tools.eq_(actual_content, expected)
 
 
 def test_source_file():
@@ -29,8 +30,8 @@ TEST(blaTest, test1) {
 }
 """
     actual_path, actual_content = test_dir.create_source_file({})
-    assert actual_path == 'root/path/TestDummyProject.cpp'
-    assert actual_content == expected
+    nose.tools.eq_(actual_path, 'root/path/TestDummyProject.cpp')
+    nose.tools.eq_(actual_content, expected)
 
 
 def test_create_cmakelists_no_conan():
@@ -52,8 +53,8 @@ add_executable(${BINARY} ${TEST_SOURCES})
 add_test(NAME ${BINARY} COMMAND ${BINARY})
 """
     actual_path, actual_content = test_dir.create_cmakelists({})
-    assert actual_path == 'root/path/CMakeLists.txt'
-    assert actual_content == expected
+    nose.tools.eq_(actual_path, 'root/path/CMakeLists.txt')
+    nose.tools.eq_(actual_content, expected)
 
 
 def test_create_cmakelists_conan():
@@ -88,5 +89,5 @@ add_test(NAME ${BINARY} COMMAND ${BINARY})
 """
     actual_path, actual_content = test_dir.create_cmakelists({})
     print(actual_content)
-    assert actual_path == 'root/path/CMakeLists.txt'
-    assert actual_content == expected
+    nose.tools.eq_(actual_path, 'root/path/CMakeLists.txt')
+    nose.tools.eq_(actual_content, expected)

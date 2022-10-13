@@ -1,4 +1,5 @@
 from nose.tools import raises
+import nose.tools
 
 from cmake_project_creator import dependency, project_creator, source_directory
 
@@ -74,8 +75,8 @@ DIRECTORIES = [{
 
 def test_collect_cmake_subdirectories():
     paths = project_creator.collect_cmake_subdirectories(DIRECTORIES)
-    assert ['proj/code/src', 'proj/code/tests',
-            'proj/othercode/src', 'proj/othercode/tests'] == paths
+    nose.tools.eq_(['proj/code/src', 'proj/code/tests',
+            'proj/othercode/src', 'proj/othercode/tests'], paths)
 
 
 def test_parse_directories():
@@ -91,7 +92,7 @@ def test_parse_directories():
                                                  "DummyProject", [])}
     parsed_directories = project_creator.parse_directories(single_directory,
                                                            "projects_root", "", "DummyProject")
-    assert expected == parsed_directories
+    nose.tools.eq_(expected, parsed_directories)
 
 
 def test_collect_conan_dependencies():
@@ -112,7 +113,7 @@ def test_collect_conan_dependencies():
     parsed_directories = [
         source_directory.SourceDirectory("projects_root", "src", single_directory[0],
                                          "DummyProject", [conan_dependency])]
-    assert {'gtest': '1.8.1'} == project_creator.collect_conan_dependencies(parsed_directories)
+    nose.tools.eq_({'gtest': '1.8.1'}, project_creator.collect_conan_dependencies(parsed_directories))
 
 
 @raises(ValueError)
@@ -155,8 +156,8 @@ add_subdirectory("test")
     actual_path, actual_content = project_creator.create_main_cmakelists("projects_root", "dummy",
                                                                          ["src", "test"], None)
 
-    assert actual_content == expected
-    assert actual_path == "projects_root/dummy/CMakeLists.txt"
+    nose.tools.eq_(actual_content, expected)
+    nose.tools.eq_(actual_path, "projects_root/dummy/CMakeLists.txt")
 
 
 def test_create_main_cmakelists_with_compiler_options():
@@ -172,8 +173,8 @@ add_subdirectory("test")
     actual_path, actual_content = project_creator.create_main_cmakelists("projects_root", "dummy",
                                                                          ["src", "test"], None, ["-Wall", "-Wextra", "-Wpedantic", "-Werror"])
 
-    assert actual_content == expected, "%r != %r" % (actual_content, expected)
-    assert actual_path == "projects_root/dummy/CMakeLists.txt"
+    nose.tools.eq_(actual_content, expected, "%r != %r" % (actual_content, expected))
+    nose.tools.eq_(actual_path, "projects_root/dummy/CMakeLists.txt")
 
 
 
@@ -189,8 +190,8 @@ add_subdirectory("test")
     actual_path, actual_content = project_creator.create_main_cmakelists("projects_root", "dummy",
                                                                          ["src", "test"], "14")
 
-    assert actual_content == expected
-    assert actual_path == "projects_root/dummy/CMakeLists.txt"
+    nose.tools.eq_(actual_content, expected)
+    nose.tools.eq_(actual_path, "projects_root/dummy/CMakeLists.txt")
 
 def test_collect_compiler_options():
     project_description = {	"compilerOptions": [
@@ -198,10 +199,10 @@ def test_collect_compiler_options():
 	]}
     expected = ["-Wall", "-Wextra", "-Wpedantic", "-Werror"]
 
-    assert project_creator.collect_compiler_options(project_description) == expected
+    nose.tools.eq_(project_creator.collect_compiler_options(project_description), expected)
 
 def test_collect_compiler_options_missing_input():
     project_description = {}
     expected = []
 
-    assert project_creator.collect_compiler_options(project_description) == expected
+    nose.tools.eq_(project_creator.collect_compiler_options(project_description), expected)

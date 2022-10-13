@@ -1,4 +1,5 @@
 from nose.tools import raises
+import nose.tools
 
 from cmake_project_creator import dependency
 
@@ -10,7 +11,7 @@ def test_make_dependencies_ignore_internals():
     }]
 
     dependencies = dependency.Dependency.make_dependencies(raw_dependencies)
-    assert len(dependencies) == 0
+    nose.tools.eq_(len(dependencies), 0)
 
 
 @raises(ValueError)
@@ -39,8 +40,8 @@ def test_make_dependencies_conan_is_made():
     }]
 
     dependencies = dependency.Dependency.make_dependencies(raw_dependencies)
-    assert len(dependencies) == 1
-    assert dependency.Dependency("conan", "gtest", "1.8.1") == dependencies[0]
+    nose.tools.eq_(len(dependencies), 1)
+    nose.tools.eq_(dependency.Dependency("conan", "gtest", "1.8.1"), dependencies[0])
 
 
 def test_dependency_does_not_equal_non_dependency_object():
@@ -51,4 +52,4 @@ def test_dependency_does_not_equal_non_dependency_object():
         dummy class so that we can test Dependency.__eq__
         """
 
-    assert a_dependency.__eq__(Person) is False
+    nose.tools.ok_(not a_dependency.__eq__(Person))

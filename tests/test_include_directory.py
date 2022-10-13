@@ -1,4 +1,5 @@
 from cmake_project_creator import include_directory
+import nose.tools
 
 
 class TestIncludeDirectory:
@@ -18,5 +19,5 @@ public:
 };
 """
         actual_path, actual_content = directory.create_header_content()
-        assert 'root/path/DummyProject.h' == actual_path
-        assert expected == actual_content
+        nose.tools.eq_('root/path/DummyProject.h', actual_path)
+        nose.tools.eq_(expected, actual_content)
