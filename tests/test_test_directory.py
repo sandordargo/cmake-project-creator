@@ -3,7 +3,8 @@ from cmake_project_creator import test_directory, dependency
 import nose.tools
 
 def test_create_main():
-    test_dir = test_directory.TestDirectory("projects_root", "root/path", {}, "DummyProject", [])
+    test_dir = test_directory.TestDirectory("projects_root", "root/path", {}, "DummyProject",
+                                            [dependency.Dependency("conan", "gtest", "1.8.1")])
     expected = \
 """#include "gtest/gtest.h"
 
@@ -18,7 +19,8 @@ int main(int argc, char **argv) {
 
 
 def test_source_file():
-    test_dir = test_directory.TestDirectory("projects_root", "root/path", {}, "DummyProject", [])
+    test_dir = test_directory.TestDirectory("projects_root", "root/path", {}, "DummyProject",
+                                            [dependency.Dependency("conan", "gtest", "1.8.1")])
     expected = \
 """#include "gtest/gtest.h"
 #include "DummyProject.h"
@@ -30,6 +32,7 @@ TEST(blaTest, test1) {
 }
 """
     actual_path, actual_content = test_dir.create_source_file({})
+
     nose.tools.eq_(actual_path, 'root/path/TestDummyProject.cpp')
     nose.tools.eq_(actual_content, expected)
 

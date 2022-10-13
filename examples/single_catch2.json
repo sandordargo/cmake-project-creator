@@ -1,13 +1,10 @@
 {
 	"projectName": "MyTestProjectSingle",
 	"c++Standard": "17",
-	"compilerOptions": [
-		"-Wall", "-Wextra", "-Wpedantic", "-Werror"
-	],
 	"directories": [{
 			"name": "src",
 			"type": "source",
-			"library": "shared",
+			"library": "static",
 			"executable": "true",
 			"include": "true",
 			"dependencies": [],
@@ -23,8 +20,8 @@
 			"type": "tests",
 			"dependencies": [{
 				"type": "conan",
-				"name": "gtest",
-				"version": "1.8.1"
+				"name": "catch2",
+				"version": "3.1.0"
 			}],
 			"subdirectories": []
 		}
