@@ -1,4 +1,5 @@
 from nose.tools import raises
+import nose.tools
 
 from cmake_project_creator import test_directory, include_directory, \
     directory_factory, source_directory
@@ -19,7 +20,7 @@ def test_make_source():
     }
     directory = directory_factory.make("projects_root", "foo", description, "DummyProjectFileName")
 
-    assert isinstance(directory, source_directory.SourceDirectory) is True
+    nose.tools.ok_(isinstance(directory, source_directory.SourceDirectory))
 
 
 def test_make_include():
@@ -30,7 +31,7 @@ def test_make_include():
     }
     directory = directory_factory.make("projects_root", "foo", description, "DummyProjectFileName")
 
-    assert isinstance(directory, include_directory.IncludeDirectory) is True
+    nose.tools.ok_(isinstance(directory, include_directory.IncludeDirectory))
 
 
 def test_make_test():
@@ -46,7 +47,7 @@ def test_make_test():
     }
     directory = directory_factory.make("projects_root", "foo", description, "DummyProjectFileName")
 
-    assert isinstance(directory, test_directory.TestDirectory) is True
+    nose.tools.ok_(isinstance(directory, test_directory.TestDirectory))
 
 
 @raises(KeyError)

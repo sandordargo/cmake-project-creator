@@ -1,4 +1,6 @@
 from nose.tools import raises
+import nose.tools
+
 from cmake_project_creator import directory, source_directory
 
 
@@ -27,8 +29,8 @@ def test_raise_if_invalid_dependency_when_all_empty():
 def test_get_include_library_of_directory():
     path = "root/project/src"
     expected = "project/include"
-    assert expected == source_directory.get_include_library_of_directory(
-        directory.Directory("projects_root", path, {}, "", []))
+    nose.tools.eq_(expected, source_directory.get_include_library_of_directory(
+        directory.Directory("projects_root", path, {}, "", [])))
 
 
 def test_creates_main():
@@ -58,8 +60,8 @@ int main() {
 }
 """
     actual_path, actual_content = source_dir.create_main(None)
-    assert 'root/path/main.cpp' == actual_path
-    assert expected == actual_content
+    nose.tools.eq_('root/path/main.cpp', actual_path)
+    nose.tools.eq_(expected, actual_content)
 
 
 def test_empty_creates_main():
@@ -82,8 +84,8 @@ def test_empty_creates_main():
                                                   [])
     expected = ""
     actual_path, actual_content = source_dir.create_main(None)
-    assert None == actual_path
-    assert expected == actual_content
+    nose.tools.eq_(None, actual_path)
+    nose.tools.eq_(expected, actual_content)
 
 
 def test_source_file():
@@ -113,8 +115,8 @@ void DummyProject::hello() {
 }
 """
     actual_path, actual_content = source_dir.create_source_file(None)
-    assert 'root/path/DummyProject.cpp' == actual_path
-    assert expected == actual_content
+    nose.tools.eq_('root/path/DummyProject.cpp', actual_path)
+    nose.tools.eq_(expected, actual_content)
 
 
 def test_create_cmakelists_conan():
@@ -151,8 +153,8 @@ add_executable(DummyProject_path ${SOURCES})
 """
     actual_path, actual_content = source_dir.create_cmakelists([])
     print(actual_content)
-    assert 'root/path/CMakeLists.txt' == actual_path
-    assert expected == actual_content, "%r != %r" % (expected, actual_content)
+    nose.tools.eq_('root/path/CMakeLists.txt', actual_path)
+    nose.tools.eq_(expected, actual_content, "%r != %r" % (expected, actual_content))
 
 
 @raises(ValueError)
@@ -195,7 +197,7 @@ def test_custom_library_name():
                                                   description,
                                                   "DummyProject",
                                                   [])
-    assert source_dir.build_library_command().startswith("add_library(dualCustomLibraryName STATIC") == True
+    nose.tools.eq_(source_dir.build_library_command().startswith("add_library(dualCustomLibraryName STATIC"), True)
 
 
 def test_custom_executable_name():
@@ -216,7 +218,7 @@ def test_custom_executable_name():
                                                   description,
                                                   "DummyProject",
                                                   [])
-    assert source_dir.build_executable_command().startswith("add_executable(dual_lib_custom_executable") == True
+    nose.tools.eq_(source_dir.build_executable_command().startswith("add_executable(dual_lib_custom_executable"), True)
 
 
 def test_string_representation():
@@ -238,8 +240,8 @@ def test_string_representation():
                                                   "DummyProject",
                                                   [])
 
-    assert str(source_dir) == "Directory(path: root/path, " \
+    nose.tools.eq_(str(source_dir), "Directory(path: root/path, " \
                               "description:{'name': 'src', 'type': 'source', 'library': None, " \
                               "'executable': 'true', 'include': 'true', 'dependencies': [" \
                               "{'type': 'internal', 'link': 'proj/othercode/src'}], " \
-                              "'subdirectories': []})"
+                              "'subdirectories': []})")
