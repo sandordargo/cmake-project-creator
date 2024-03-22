@@ -45,38 +45,73 @@ def parse_arguments():
 
 def create_plumbing(output_root, path, subdirs, parsed_directories):
     conan_dependencies = collect_conan_dependencies(parsed_directories.values())
+    conan2_dependencies = collect_conan2_dependencies(parsed_directories.values())
     is_conan = len(conan_dependencies) > 0
-
-    conan_install = "conan install .. -s compiler.libcxx=libstdc++11" if is_conan else ""
-
-    print(subdirs)
-    runtest = " ; ".join(
-        f"./{sd}/bin/{path}_{sd.split('/')[-2] if '/' in sd else sd}_test"
-        for sd in subdirs if 'test' in sd)
-    runtest = f"({runtest})" if runtest else ""
+    is_conan2 = len(conan2_dependencies) > 0
+    if is_conan and is_conan2:
+        raise ValueError("You cannot use both conan and conan2 dependencies at the same time")
+    conan_version = 0
+    if is_conan:
+        conan_version = 1
+    elif is_conan2:
+        conan_version = 2
 
     with open(f'{os.path.join(output_root, path)}/runTests.sh', "w") as run_tests:
-        run_tests.write(
-            f"""CURRENT_DIR=`pwd`
-cd build && rm -rf * && {(conan_install + " &&") if conan_install else ""} \
-cmake .. && make {"&& " + runtest if runtest else ""}
-cd "${{CURRENT_DIR}}"
-""")
+        run_tests.write(create_runtest(conan_version, path, subdirs))
     file_stats = os.stat(f'{os.path.join(output_root, path)}/runTests.sh')
     os.chmod(f'{os.path.join(output_root, path)}/runTests.sh', file_stats.st_mode | stat.S_IEXEC)
 
     if is_conan:
         with open(f'{os.path.join(output_root, path)}/conanfile.txt', "w") as conanfile:
-            requires = [f"{name}/{version}" for name, version in conan_dependencies.items()]
-            requires_command = "\n".join(requires)
-            conanfile.write(
-                f"""[requires]
+            conanfile.write(create_conanfile(conan_dependencies))
+    if is_conan2:
+            with open(f'{os.path.join(output_root, path)}/conanfile.txt', "w") as conanfile:
+                conanfile.write(create_conanfile2(conan2_dependencies))
+
+def create_runtest(conan_version, path, subdirs):
+    if conan_version == 1:
+        conan_install = "conan install . -s compiler.libcxx=libstdc++11"
+    elif conan_version == 2:
+        conan_install = "conan install . --output-folder=build --build=missing"
+    else:
+        conan_install = ""
+    
+    print(subdirs)
+
+    runtest = " ; ".join(
+        f"./{sd}/{path}_{sd.split('/')[-2] if '/' in sd else sd}_test"
+        for sd in subdirs if 'test' in sd)
+    runtest = f"({runtest})" if runtest else ""
+
+    return f"""CURRENT_DIR=`pwd`
+rm -rf build && mkdir build && {(conan_install + " &&") if conan_install else ""} \
+cd build && cmake .. {"-DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release" if conan_version == 2 else ""} && cmake --build . {"&& " + runtest if runtest else ""}
+cd "${{CURRENT_DIR}}"
+"""
+
+def create_conanfile(dependencies):
+    requires = [f"{name}/{version}" for name, version in dependencies.items()]
+    requires_command = "\n".join(requires)
+    return f"""[requires]
 {requires_command}
 
 [generators]
 cmake
-""")
+"""
 
+def create_conanfile2(dependencies):
+    requires = [f"{name}/{version}" for name, version in dependencies.items()]
+    requires_command = "\n".join(requires)
+    return f"""[requires]
+    {requires_command}
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[layout]
+cmake_layout
+"""
 
 def collect_cmake_subdirectories(directories, name="", paths=None):
     if not paths:
@@ -95,7 +130,7 @@ def create_main_cmakelists(output_root, project_directory_name, subdirectories, 
     add_subdirectories_commands = ""
     if cpp_version is None:
         cpp_version = "17"
-    if cpp_version not in ["98", "11", "14", "17", "20"]:
+    if cpp_version not in ["98", "11", "14", "17", "20", "23"]:
         raise ValueError(f"{cpp_version} is not among the supported C++ versions")
     compiler_options_list = compiler_options_list or []
 
@@ -153,6 +188,18 @@ def collect_conan_dependencies(parsed_directories):
     for directory in parsed_directories:
         for dependency in directory.dependencies:
             if dependency.type == "conan":
+                if dependency.name in conan_dependencies:
+                    if dependency.version != conan_dependencies[dependency.name]:
+                        raise ValueError(f"{dependency.name} is referenced with multiple versions")
+                else:
+                    conan_dependencies[dependency.name] = dependency.version
+    return conan_dependencies
+
+def collect_conan2_dependencies(parsed_directories):
+    conan_dependencies = {}
+    for directory in parsed_directories:
+        for dependency in directory.dependencies:
+            if dependency.type == "conan2":
                 if dependency.name in conan_dependencies:
                     if dependency.version != conan_dependencies[dependency.name]:
                         raise ValueError(f"{dependency.name} is referenced with multiple versions")

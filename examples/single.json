@@ -1,10 +1,10 @@
 {
-	"projectName": "MyTestProjectSingle",
-	"c++Standard": "17",
+	"projectName": "Tennis",
+	"c++Standard": "20",
 	"directories": [{
 			"name": "src",
 			"type": "source",
-			"library": null,
+			"library": "shared",
 			"executable": "true",
 			"include": "true",
 			"dependencies": [],
@@ -19,9 +19,9 @@
 			"name": "tests",
 			"type": "tests",
 			"dependencies": [{
-				"type": "conan",
+				"type": "conan2",
 				"name": "gtest",
-				"version": "1.8.1"
+				"version": "1.14.0"
 			}],
 			"subdirectories": []
 		}
