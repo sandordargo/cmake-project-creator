@@ -115,6 +115,27 @@ def test_collect_conan_dependencies():
                                          "DummyProject", [conan_dependency])]
     nose.tools.eq_({'gtest': '1.8.1'}, project_creator.collect_conan_dependencies(parsed_directories))
 
+def test_collect_conan2_dependencies():
+    single_directory = [{
+        "name": "src",
+        "type": "source",
+        "executable": "true",
+        "include": "true",
+        "dependencies": [{
+            "type": "internal",
+            "link": "proj/othercode/src"
+        }],
+        "subdirectories": []
+    }]
+
+    conan_dependency = dependency.Dependency("conan2", "gtest", "1.8.1")
+
+    parsed_directories = [
+        source_directory.SourceDirectory("projects_root", "src", single_directory[0],
+                                         "DummyProject", [conan_dependency])]
+    nose.tools.eq_({'gtest': '1.8.1'}, project_creator.collect_conan2_dependencies(parsed_directories))
+
+
 
 @raises(ValueError)
 def test_conflicting_conan_deps():
@@ -206,3 +227,48 @@ def test_collect_compiler_options_missing_input():
     expected = []
 
     nose.tools.eq_(project_creator.collect_compiler_options(project_description), expected)
+
+def test_create_runtest_with_conan2():
+    expected = """CURRENT_DIR=`pwd`
+rm -rf build && mkdir build && conan install . --output-folder=build --build=missing && cd build && cmake .. -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release && cmake --build . && (./tests/dummy_tests_test)
+cd "${CURRENT_DIR}"
+"""
+    subdirectories = ['src', 'tests']
+
+    nose.tools.eq_(project_creator.create_runtest(2, "dummy", ['src', 'tests']), expected)
+
+def test_create_runtest_with_conan1():
+    expected = """CURRENT_DIR=`pwd`
+rm -rf build && mkdir build && conan install . -s compiler.libcxx=libstdc++11 && cd build && cmake ..  && cmake --build . && (./tests/dummy_tests_test)
+cd "${CURRENT_DIR}"
+"""
+    subdirectories = ['src', 'tests']
+
+    nose.tools.eq_(project_creator.create_runtest(1, "dummy", ['src', 'tests']), expected)
+
+
+def test_create_conanfile():
+    expected = \
+    """[requires]
+gtest/1.8.1
+
+[generators]
+cmake
+"""
+    conan_dependencies = {"gtest": "1.8.1"}
+    nose.tools.eq_(project_creator.create_conanfile(conan_dependencies), expected)
+
+def test_create_conanfile2():
+    expected = \
+    """[requires]
+    gtest/1.14.0
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[layout]
+cmake_layout
+"""
+    conan2_dependencies = {"gtest": "1.14.0"}
+    nose.tools.eq_(project_creator.create_conanfile2(conan2_dependencies), expected)
